@@ -1,6 +1,5 @@
 package com.raphau.springboot.stockExchange.rest;
 
-import com.raphau.springboot.stockExchange.dao.BuyOfferRepository;
 import com.raphau.springboot.stockExchange.entity.BuyOffer;
 import com.raphau.springboot.stockExchange.entity.User;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;

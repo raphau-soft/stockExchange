@@ -100,4 +100,16 @@ public class BuyOffer implements Serializable {
     public void setDateLimit(Date dateLimit) {
         this.dateLimit = dateLimit;
     }
+
+    @Override
+    public String toString() {
+        return "BuyOffer{" +
+                "id=" + id +
+                ", company=" + company +
+                ", user=" + user +
+                ", minPrice=" + minPrice +
+                ", amount=" + amount +
+                ", dateLimit=" + dateLimit +
+                '}';
+    }
 }
