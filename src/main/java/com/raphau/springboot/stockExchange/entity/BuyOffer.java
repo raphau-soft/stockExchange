@@ -20,16 +20,12 @@ public class BuyOffer implements Serializable {
     @Column(name="id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="company_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private Company company;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = User.class,fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private User user;
 
     @Column(name="min_price")

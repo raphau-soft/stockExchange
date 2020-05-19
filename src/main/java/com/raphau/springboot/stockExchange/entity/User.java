@@ -38,7 +38,6 @@ public class User implements Serializable {
     @Column(name="role")
     private String roles;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BuyOffer> buyOffers;
 

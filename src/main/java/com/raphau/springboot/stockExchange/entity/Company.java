@@ -17,8 +17,6 @@ public class Company {
     @Column(name="name")
     private String name;
 
-    @JsonManagedReference
-    @Transient
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BuyOffer> buyOffers;
 
