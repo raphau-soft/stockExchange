@@ -17,10 +17,8 @@ public class Stock_rate {
     private int id;
 
     // company
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = Company.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="company_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private Company company;
 
     @Column(name="rate")

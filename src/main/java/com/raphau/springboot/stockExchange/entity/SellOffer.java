@@ -1,10 +1,12 @@
 package com.raphau.springboot.stockExchange.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.raphau.springboot.stockExchange.dto.SellOfferDTO;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -16,17 +18,15 @@ public class SellOffer {
     @Column(name="id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = Stock.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="stock_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private Stock stock;
 
     @Column(name="amount")
     private int amount;
 
     @Column(name="max_price")
-    private int maxPrice;
+    private BigDecimal maxPrice;
 
     @Column(name="date_limit")
     private Date dateLimit;
@@ -34,12 +34,20 @@ public class SellOffer {
     public SellOffer() {
     }
 
-    public SellOffer(int id, Stock stock, int amount, int maxPrice, Date dateLimit) {
+    public SellOffer(int id, Stock stock, int amount, BigDecimal maxPrice, Date dateLimit) {
         this.id = id;
         this.stock = stock;
         this.amount = amount;
         this.maxPrice = maxPrice;
         this.dateLimit = dateLimit;
+    }
+
+    public SellOffer(SellOfferDTO sellOfferDTO, Stock stock) {
+        this.id = sellOfferDTO.getId();
+        this.stock = stock;
+        this.amount = sellOfferDTO.getAmount();
+        this.maxPrice = sellOfferDTO.getMaxPrice();
+        this.dateLimit = sellOfferDTO.getDateLimit();
     }
 
     public int getId() {
@@ -66,11 +74,11 @@ public class SellOffer {
         this.amount = amount;
     }
 
-    public int getMaxPrice() {
+    public BigDecimal getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(int maxPrice) {
+    public void setMaxPrice(BigDecimal maxPrice) {
         this.maxPrice = maxPrice;
     }
 

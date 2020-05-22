@@ -16,16 +16,12 @@ public class Transaction {
     @Column(name="id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = BuyOffer.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="buy_offer_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private BuyOffer buyOffer;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = SellOffer.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="sell_offer_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
     private SellOffer sellOffer;
 
     @Column(name="amount")

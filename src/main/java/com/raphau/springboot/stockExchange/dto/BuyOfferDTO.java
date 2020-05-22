@@ -1,16 +1,10 @@
 package com.raphau.springboot.stockExchange.dto;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-import jdk.nashorn.internal.objects.annotations.Setter;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-@Entity
 public class BuyOfferDTO {
-    @Id
+
     private int id;
     private int company_id;
     private int user_id;
