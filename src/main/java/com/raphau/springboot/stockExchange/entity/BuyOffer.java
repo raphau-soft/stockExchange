@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="buy_offer", schema = "stock_exchange")
@@ -27,6 +28,10 @@ public class BuyOffer implements Serializable {
     @ManyToOne(targetEntity = User.class,fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="user_id")
     private User user;
+
+    @OneToMany(mappedBy = "buyOffer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Transaction> transactions;
 
     @Column(name="min_price")
     private BigDecimal minPrice;

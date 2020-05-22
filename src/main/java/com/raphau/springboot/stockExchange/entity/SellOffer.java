@@ -4,14 +4,17 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.raphau.springboot.stockExchange.dto.SellOfferDTO;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="sell_offer")
-public class SellOffer {
+public class SellOffer implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +24,10 @@ public class SellOffer {
     @ManyToOne(targetEntity = Stock.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="stock_id", nullable = false)
     private Stock stock;
+
+    @OneToMany(mappedBy = "sellOffer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Transaction> transactions;
 
     @Column(name="amount")
     private int amount;

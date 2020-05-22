@@ -1,7 +1,10 @@
 package com.raphau.springboot.stockExchange.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.raphau.springboot.stockExchange.dto.UserDTO;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -36,15 +39,33 @@ public class User implements Serializable {
     private String email;
 
     @Column(name="role")
-    private String roles;
+    private String role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<BuyOffer> buyOffers;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Stock> stocks;
+
+
 
     public User() {
     }
 
-    public User(int id, String name, String surname, String username, String password, BigDecimal money, String email, String roles) {
+    public User(UserDTO userDTO) {
+        this.id = userDTO.getId();
+        this.name = userDTO.getName();
+        this.surname = userDTO.getSurname();
+        this.username = userDTO.getUsername();
+        this.password = userDTO.getPassword();
+        this.email = userDTO.getEmail();
+        this.money = userDTO.getMoney();
+        this.role = userDTO.getRole();
+    }
+
+    public User(int id, String name, String surname, String username, String password, BigDecimal money, String email, String role) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -52,7 +73,7 @@ public class User implements Serializable {
         this.password = password;
         this.money = money;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 
     public List<BuyOffer> getBuyOffers() {
@@ -119,14 +140,21 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoles(String roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 
+    public List<Stock> getStocks() {
+        return stocks;
+    }
+
+    public void setStocks(List<Stock> stocks) {
+        this.stocks = stocks;
+    }
 
     @Override
     public String toString() {
@@ -138,7 +166,7 @@ public class User implements Serializable {
                 ", password='" + password + '\'' +
                 ", money=" + money +
                 ", email='" + email + '\'' +
-                ", roles='" + roles + '\'' +
+                ", roles='" + role + '\'' +
                 '}';
     }
 }

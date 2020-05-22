@@ -1,13 +1,15 @@
 package com.raphau.springboot.stockExchange.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name="Company", schema = "stock_exchange")
-public class Company {
+public class Company implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +20,26 @@ public class Company {
     private String name;
 
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<BuyOffer> buyOffers;
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Stock> stocks;
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Stock_rate> stock_rates;
 
     public Company() {
     }
 
-    public Company(int id, String name, List<BuyOffer> buyOffers) {
+    public Company(int id, String name) {
         this.id = id;
         this.name = name;
         this.buyOffers = buyOffers;
+        this.stocks = stocks;
+        this.stock_rates = stock_rates;
     }
 
     public int getId() {

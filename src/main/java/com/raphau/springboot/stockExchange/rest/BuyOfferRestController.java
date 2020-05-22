@@ -30,7 +30,7 @@ public class BuyOfferRestController {
 
     @PostMapping("/buyOffer")
     public void addOffer(@RequestBody BuyOfferDTO buyOfferDTO){
-
+        System.out.println("BuyOffer - -");
         Optional<User> user = userRepository.findById(buyOfferDTO.getUser_id());
         Optional<Company> company = companyRepository.findById(buyOfferDTO.getCompany_id());
 
