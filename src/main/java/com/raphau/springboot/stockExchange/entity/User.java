@@ -45,11 +45,9 @@ public class User implements Serializable {
     @JsonBackReference
     private List<BuyOffer> buyOffers;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonBackReference
     private List<Stock> stocks;
-
-
 
     public User() {
     }

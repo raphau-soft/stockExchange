@@ -40,6 +40,14 @@ public class Stock implements Serializable {
         this.amount = amount;
     }
 
+    public List<SellOffer> getSellOffers() {
+        return sellOffers;
+    }
+
+    public void setSellOffers(List<SellOffer> sellOffers) {
+        this.sellOffers = sellOffers;
+    }
+
     public int getId() {
         return id;
     }

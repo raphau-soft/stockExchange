@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,11 +57,20 @@ public class UserRestController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        Optional<User> user = userService.findByUsername(userDetails.getUsername());
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
 
-        // TODO: return user's sell offers
+        User user;
 
-        return null;
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return null;
+
+        List<SellOffer> sellOffers = new ArrayList<>();
+        List<Stock> stocks = user.getStocks();
+
+        stocks.forEach(stock -> {sellOffers.addAll(stock.getSellOffers());});
+
+        return sellOffers;
     }
 
     // TODO: DeleteMapping for sell offers and buy offers
