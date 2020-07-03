@@ -5,8 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-// TODO: finish endpoints, add exception handling
-
 @SpringBootApplication
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 public class StockExchangeApplication {
