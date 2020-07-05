@@ -11,6 +11,5 @@ import java.util.Optional;
 @Repository
 public interface SellOfferRepository extends JpaRepository<SellOffer, Integer> {
 
-//    Optional<List<SellOffer>> findAllBy
 
 }

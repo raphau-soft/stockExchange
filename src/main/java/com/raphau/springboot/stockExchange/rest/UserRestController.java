@@ -1,8 +1,10 @@
 package com.raphau.springboot.stockExchange.rest;
 
+import com.raphau.springboot.stockExchange.dao.BuyOfferRepository;
 import com.raphau.springboot.stockExchange.dao.SellOfferRepository;
 import com.raphau.springboot.stockExchange.dao.StockRepository;
 import com.raphau.springboot.stockExchange.dao.UserRepository;
+import com.raphau.springboot.stockExchange.dto.UserUpdDTO;
 import com.raphau.springboot.stockExchange.entity.BuyOffer;
 import com.raphau.springboot.stockExchange.entity.SellOffer;
 import com.raphau.springboot.stockExchange.entity.Stock;
@@ -29,6 +31,12 @@ public class UserRestController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SellOfferRepository sellOfferRepository;
+
+    @Autowired
+    private BuyOfferRepository buyOfferRepository;
+
     @GetMapping("/user")
     public User find(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -52,6 +60,21 @@ public class UserRestController {
         return user.get().getBuyOffers();
     }
 
+    @GetMapping("/user/resources")
+    public List<Stock> findResources(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+
+        User user;
+
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return null;
+
+        return user.getStocks();
+    }
+
     @GetMapping("/user/sellOffers")
     public List<SellOffer> findSellOffers(){
 
@@ -73,40 +96,60 @@ public class UserRestController {
         return sellOffers;
     }
 
-    // TODO: DeleteMapping for sell offers and buy offers
-    // TODO: GetMapping user's stocks
-    // TODO: PutMapping update login
-    // TODO: return TestDetails in every EndPoint
+    @DeleteMapping("user/sellOffers/{theId}")
+    public void deleteSellOffer(@PathVariable int theId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
 
-//    @GetMapping("/user/{theId}")
-//    public User findById(@PathVariable int theId){
-//        User user = userService.findById(theId);
-//        return user;
-//    }
-//
-//    @PostMapping("/user")
-//    public User addUser(@RequestBody User user){
-//        user.setId(0);
-//        userService.save(user);
-//        return user;
-//    }
-//
-//    @PutMapping("/user")
-//    public User updateUser(@RequestBody User user){
-//        userService.save(user);
-//        return user;
-//    }
-//
-//    @DeleteMapping("/user/{theId}")
-//    public String deleteUser(@PathVariable int theId){
-//        User user = userService.findById(theId);
-//
-//        if(user == null){
-//            throw new RuntimeException("Didn't find user with given id: " + theId);
-//        }
-//
-//        userService.deleteById(theId);
-//
-//        return "Deleted user with id: " + theId;
-//    }
+        User user;
+
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return;
+
+        Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
+
+        if(sellOfferOptional.isPresent()) {
+            sellOfferRepository.deleteById(theId);
+        }
+    }
+
+    @DeleteMapping("user/buyOffers/{theId}")
+    public void deleteBuyOffer(@PathVariable int theId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+
+        User user;
+
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return;
+
+        Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
+
+        if(buyOfferOptional.isPresent()) {
+            buyOfferRepository.deleteById(theId);
+        }
+    }
+
+    @PutMapping("user/login")
+    public void updateUser(@RequestBody UserUpdDTO userUpdDTO){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+
+        User user;
+
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return;
+
+        user.setUsername(userUpdDTO.getLogin());
+        user.setPassword(userUpdDTO.getPassword());
+
+        userRepository.save(user);
+    }
+    // TODO: return TestDetails in every EndPoint
 }
