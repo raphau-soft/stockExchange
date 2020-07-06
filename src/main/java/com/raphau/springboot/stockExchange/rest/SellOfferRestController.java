@@ -3,6 +3,7 @@ package com.raphau.springboot.stockExchange.rest;
 import com.raphau.springboot.stockExchange.dao.SellOfferRepository;
 import com.raphau.springboot.stockExchange.dao.StockRepository;
 import com.raphau.springboot.stockExchange.dto.SellOfferDTO;
+import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.entity.SellOffer;
 import com.raphau.springboot.stockExchange.entity.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,17 @@ public class SellOfferRestController {
     private SellOfferRepository sellOfferRepository;
 
     @PostMapping("/sellOffer")
-    public void addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) {
+    public TestDetailsDTO addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) {
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         sellOfferDTO.setId(0);
+        long timeBase = System.currentTimeMillis();
         Optional<Stock> stockOptional = stockRepository.findById(sellOfferDTO.getStock_id());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         SellOffer sellOffer = new SellOffer(sellOfferDTO, stockOptional.get());
         sellOfferRepository.save(sellOffer);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+        return testDetailsDTO;
     }
 
 }

@@ -2,8 +2,8 @@ package com.raphau.springboot.stockExchange.rest;
 
 import com.raphau.springboot.stockExchange.dao.BuyOfferRepository;
 import com.raphau.springboot.stockExchange.dao.SellOfferRepository;
-import com.raphau.springboot.stockExchange.dao.StockRepository;
 import com.raphau.springboot.stockExchange.dao.UserRepository;
+import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.dto.UserUpdDTO;
 import com.raphau.springboot.stockExchange.entity.BuyOffer;
 import com.raphau.springboot.stockExchange.entity.SellOffer;
@@ -17,9 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -38,33 +36,58 @@ public class UserRestController {
     private BuyOfferRepository buyOfferRepository;
 
     @GetMapping("/user")
-    public User find(){
+    public Map<String, Object> find(){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        long timeBase = System.currentTimeMillis();
         Optional<User> user = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if (!user.isPresent()){
-            throw new RuntimeException("User nof found");
+            throw new RuntimeException("User not found");
         }
-
-        return user.get();
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("user", user.get());
+        objects.put("testDetails", testDetailsDTO);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+        return objects;
     }
 
     @GetMapping("/user/buyOffers")
-    public List<BuyOffer> findBuyOffers(){
-
+    public Map<String, Object> findBuyOffers(){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        Optional<User> user = userService.findByUsername(userDetails.getUsername());
+        long timeBase = System.currentTimeMillis();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
-        return user.get().getBuyOffers();
+        User user;
+        if(userOpt.isPresent()){
+            user = userOpt.get();
+        } else return null;
+
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("buyOffers", user.getBuyOffers());
+        objects.put("testDetails", testDetailsDTO);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+
+        return objects;
     }
 
     @GetMapping("/user/resources")
-    public List<Stock> findResources(){
+    public Map<String, Object> findResources(){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+
+        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
 
@@ -72,15 +95,23 @@ public class UserRestController {
             user = userOpt.get();
         } else return null;
 
-        return user.getStocks();
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("stock", user.getStocks());
+        objects.put("testDetails", testDetailsDTO);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+
+        return objects;
     }
 
     @GetMapping("/user/sellOffers")
-    public List<SellOffer> findSellOffers(){
-
+    public Map<String, Object> findSellOffers(){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
 
@@ -93,63 +124,85 @@ public class UserRestController {
 
         stocks.forEach(stock -> {sellOffers.addAll(stock.getSellOffers());});
 
-        return sellOffers;
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("sellOffers", sellOffers);
+        objects.put("testDetails", testDetailsDTO);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+
+        return objects;
     }
 
     @DeleteMapping("user/sellOffers/{theId}")
-    public void deleteSellOffer(@PathVariable int theId){
+    public TestDetailsDTO deleteSellOffer(@PathVariable int theId){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
 
         if(userOpt.isPresent()){
             user = userOpt.get();
-        } else return;
+        } else return null;
 
         Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
 
         if(sellOfferOptional.isPresent()) {
             sellOfferRepository.deleteById(theId);
         }
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+        return testDetailsDTO;
     }
 
     @DeleteMapping("user/buyOffers/{theId}")
-    public void deleteBuyOffer(@PathVariable int theId){
+    public TestDetailsDTO deleteBuyOffer(@PathVariable int theId){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
 
         if(userOpt.isPresent()){
             user = userOpt.get();
-        } else return;
+        } else return null;
 
         Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
             buyOfferRepository.deleteById(theId);
         }
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+        return testDetailsDTO;
     }
 
     @PutMapping("user/login")
-    public void updateUser(@RequestBody UserUpdDTO userUpdDTO){
+    public TestDetailsDTO updateUser(@RequestBody UserUpdDTO userUpdDTO){
+        long timeApp = System.currentTimeMillis();
+        TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
 
         if(userOpt.isPresent()){
             user = userOpt.get();
-        } else return;
+        } else return null;
 
         user.setUsername(userUpdDTO.getLogin());
         user.setPassword(userUpdDTO.getPassword());
 
         userRepository.save(user);
+        testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
+        return testDetailsDTO;
     }
-    // TODO: return TestDetails in every EndPoint
 }
