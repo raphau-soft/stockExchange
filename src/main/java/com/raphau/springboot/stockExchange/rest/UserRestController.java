@@ -12,7 +12,6 @@ import com.raphau.springboot.stockExchange.entity.User;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -151,7 +150,8 @@ public class UserRestController {
         Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
 
         if(sellOfferOptional.isPresent()) {
-            sellOfferRepository.deleteById(theId);
+            if(sellOfferOptional.get().getStock().getUser().getId() == user.getId())
+                sellOfferRepository.deleteById(theId);
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return testDetailsDTO;
@@ -176,7 +176,8 @@ public class UserRestController {
         Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
-            buyOfferRepository.deleteById(theId);
+            if(user.getId() == buyOfferOptional.get().getUser().getId())
+                buyOfferRepository.deleteById(theId);
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return testDetailsDTO;
@@ -198,7 +199,7 @@ public class UserRestController {
             user = userOpt.get();
         } else return null;
 
-        user.setUsername(userUpdDTO.getLogin());
+        user.setUsername(userUpdDTO.getUsername());
         user.setPassword(userUpdDTO.getPassword());
 
         userRepository.save(user);

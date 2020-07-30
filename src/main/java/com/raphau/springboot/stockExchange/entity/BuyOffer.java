@@ -1,10 +1,6 @@
 package com.raphau.springboot.stockExchange.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,8 +29,8 @@ public class BuyOffer implements Serializable {
     @JsonBackReference
     private List<Transaction> transactions;
 
-    @Column(name="min_price")
-    private BigDecimal minPrice;
+    @Column(name="max_price")
+    private BigDecimal maxPrice;
 
     @Column(name="amount")
     private int amount;
@@ -45,11 +41,11 @@ public class BuyOffer implements Serializable {
     public BuyOffer() {
     }
 
-    public BuyOffer(int id, Company company, User user, BigDecimal minPrice, int amount, Date dateLimit) {
+    public BuyOffer(int id, Company company, User user, BigDecimal maxPrice, int amount, Date dateLimit) {
         this.id = id;
         this.company = company;
         this.user = user;
-        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
         this.amount = amount;
         this.dateLimit = dateLimit;
     }
@@ -78,12 +74,12 @@ public class BuyOffer implements Serializable {
         this.user = user;
     }
 
-    public BigDecimal getMinPrice() {
-        return minPrice;
+    public BigDecimal getMaxPrice() {
+        return maxPrice;
     }
 
-    public void setMinPrice(BigDecimal minPrice) {
-        this.minPrice = minPrice;
+    public void setMaxPrice(BigDecimal maxPrice) {
+        this.maxPrice = maxPrice;
     }
 
     public int getAmount() {
@@ -108,7 +104,7 @@ public class BuyOffer implements Serializable {
                 "id=" + id +
                 ", company=" + company +
                 ", user=" + user +
-                ", minPrice=" + minPrice +
+                ", maxPrice=" + maxPrice +
                 ", amount=" + amount +
                 ", dateLimit=" + dateLimit +
                 '}';

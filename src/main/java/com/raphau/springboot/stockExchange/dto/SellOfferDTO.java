@@ -7,17 +7,17 @@ public class SellOfferDTO {
 
     private int id;
     private int stock_id;
-    private BigDecimal maxPrice;
+    private BigDecimal minPrice;
     private int amount;
     private Date dateLimit;
 
     public SellOfferDTO() {
     }
 
-    public SellOfferDTO(int id, int stock_id, BigDecimal maxPrice, int amount, Date dateLimit) {
+    public SellOfferDTO(int id, int stock_id, BigDecimal minPrice, int amount, Date dateLimit) {
         this.id = id;
         this.stock_id = stock_id;
-        this.maxPrice = maxPrice;
+        this.minPrice = minPrice;
         this.amount = amount;
         this.dateLimit = dateLimit;
     }
@@ -38,12 +38,12 @@ public class SellOfferDTO {
         this.stock_id = stock_id;
     }
 
-    public BigDecimal getMaxPrice() {
-        return maxPrice;
+    public BigDecimal getMinPrice() {
+        return minPrice;
     }
 
-    public void setMaxPrice(BigDecimal maxPrice) {
-        this.maxPrice = maxPrice;
+    public void setMinPrice(BigDecimal minPrice) {
+        this.minPrice = minPrice;
     }
 
     public int getAmount() {
@@ -67,7 +67,7 @@ public class SellOfferDTO {
         return "SellOfferDTO{" +
                 "id=" + id +
                 ", stock_id=" + stock_id +
-                ", maxPrice=" + maxPrice +
+                ", maxPrice=" + minPrice +
                 ", amount=" + amount +
                 ", dateLimit=" + dateLimit +
                 '}';

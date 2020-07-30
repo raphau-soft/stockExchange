@@ -1,14 +1,13 @@
 package com.raphau.springboot.stockExchange.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name="Company", schema = "stock_exchange")
+@Table(name="company", schema = "stock_exchange")
 public class Company implements Serializable {
 
     @Id

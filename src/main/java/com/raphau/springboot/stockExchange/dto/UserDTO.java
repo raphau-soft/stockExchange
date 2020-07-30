@@ -69,7 +69,7 @@ public class UserDTO {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String login) {
         this.username = username;
     }
 

@@ -15,6 +15,7 @@ public class CompanyRestController {
     @Autowired
     private CompanyRepository companyRepository;
 
+    @CrossOrigin(origins="http://localhost:4200")
     @GetMapping("/companies")
     public List<Company> findAllCompanies(){
         return companyRepository.findAll();

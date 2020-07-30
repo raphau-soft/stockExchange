@@ -38,7 +38,7 @@ public class BuyOfferRestController {
         Optional<Company> company = companyRepository.findById(buyOfferDTO.getCompany_id());
 
         BuyOffer buyOffer = new BuyOffer(0, company.get(), user.get(),
-                buyOfferDTO.getMinPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit());
+                buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit());
         buyOfferRepository.save(buyOffer);
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);

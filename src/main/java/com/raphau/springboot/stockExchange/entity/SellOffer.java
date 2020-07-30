@@ -2,9 +2,6 @@ package com.raphau.springboot.stockExchange.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.raphau.springboot.stockExchange.dto.SellOfferDTO;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,8 +29,8 @@ public class SellOffer implements Serializable {
     @Column(name="amount")
     private int amount;
 
-    @Column(name="max_price")
-    private BigDecimal maxPrice;
+    @Column(name="min_price")
+    private BigDecimal minPrice;
 
     @Column(name="date_limit")
     private Date dateLimit;
@@ -41,11 +38,11 @@ public class SellOffer implements Serializable {
     public SellOffer() {
     }
 
-    public SellOffer(int id, Stock stock, int amount, BigDecimal maxPrice, Date dateLimit) {
+    public SellOffer(int id, Stock stock, int amount, BigDecimal minPrice, Date dateLimit) {
         this.id = id;
         this.stock = stock;
         this.amount = amount;
-        this.maxPrice = maxPrice;
+        this.minPrice = minPrice;
         this.dateLimit = dateLimit;
     }
 
@@ -53,7 +50,7 @@ public class SellOffer implements Serializable {
         this.id = sellOfferDTO.getId();
         this.stock = stock;
         this.amount = sellOfferDTO.getAmount();
-        this.maxPrice = sellOfferDTO.getMaxPrice();
+        this.minPrice = sellOfferDTO.getMinPrice();
         this.dateLimit = sellOfferDTO.getDateLimit();
     }
 
@@ -81,12 +78,12 @@ public class SellOffer implements Serializable {
         this.amount = amount;
     }
 
-    public BigDecimal getMaxPrice() {
-        return maxPrice;
+    public BigDecimal getMinPrice() {
+        return minPrice;
     }
 
-    public void setMaxPrice(BigDecimal maxPrice) {
-        this.maxPrice = maxPrice;
+    public void setMinPrice(BigDecimal minPrice) {
+        this.minPrice = minPrice;
     }
 
     public Date getDateLimit() {

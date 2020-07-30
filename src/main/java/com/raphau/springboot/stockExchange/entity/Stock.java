@@ -15,7 +15,7 @@ public class Stock implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
