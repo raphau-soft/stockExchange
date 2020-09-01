@@ -7,7 +7,6 @@ public class BuyOfferDTO {
 
     private int id;
     private int company_id;
-    private int user_id;
     private BigDecimal maxPrice;
     private int amount;
     private Date dateLimit;
@@ -15,10 +14,9 @@ public class BuyOfferDTO {
     public BuyOfferDTO() {
     }
 
-    public BuyOfferDTO(int id, int company_id, int user_id, BigDecimal maxPrice, int amount, Date dateLimit) {
+    public BuyOfferDTO(int id, int company_id, BigDecimal maxPrice, int amount, Date dateLimit) {
         this.id = id;
         this.company_id = company_id;
-        this.user_id = user_id;
         this.maxPrice = maxPrice;
         this.amount = amount;
         this.dateLimit = dateLimit;
@@ -38,14 +36,6 @@ public class BuyOfferDTO {
 
     public void setCompany_id(int company_id) {
         this.company_id = company_id;
-    }
-
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
     }
 
     public BigDecimal getMaxPrice() {

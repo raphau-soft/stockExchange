@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name="stock_rate")
-public class Stock_rate implements Serializable {
+public class StockRate implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +27,10 @@ public class Stock_rate implements Serializable {
     @Column(name="actual")
     private boolean actual;
 
-    public Stock_rate() {
+    public StockRate() {
     }
 
-    public Stock_rate(int id, Company company, double rate, Date date, boolean actual) {
+    public StockRate(int id, Company company, double rate, Date date, boolean actual) {
         this.id = id;
         this.company = company;
         this.rate = rate;

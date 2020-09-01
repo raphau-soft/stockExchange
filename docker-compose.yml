@@ -1,7 +1,7 @@
 version: '3'
 services:
-  hk-mysql:
-    container_name: hk-mysql
+  stock-mysql:
+    container_name: stock-mysql
     image: mysql/mysql-server:5.7
     environment:
       MYSQL_DATABASE: stock_exchange
@@ -12,6 +12,7 @@ services:
     restart: always
 
   app:
+    container_name: stock-back
     build: .
     volumes:
       - .:/app
@@ -21,5 +22,11 @@ services:
       - 8080:8080
     command: mvn clean spring-boot:run
     depends_on:
-      - hk-mysql
+      - stock-mysql
     restart: on-failure
+
+#  stock-front:
+#    container_name: stock-front
+#    image: raphau/stock-front:latest
+#    ports:
+#      - 4200:80

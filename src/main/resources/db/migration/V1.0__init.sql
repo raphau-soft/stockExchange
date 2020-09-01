@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `user`(
     `name` varchar(45) NOT NULL,
     `surname` varchar(45) NOT NULL,
     `username` varchar(45) NOT NULL,
-    `password` varchar(45) NOT NULL,
+    `password` varchar(120) NOT NULL,
     `role` varchar(45) NOT NULL,
     `money` float(45) NOT NULL,
     `email` varchar(45) NOT NULL,

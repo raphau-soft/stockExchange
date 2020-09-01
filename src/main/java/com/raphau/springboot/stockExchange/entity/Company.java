@@ -28,7 +28,7 @@ public class Company implements Serializable {
 
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Stock_rate> stock_rates;
+    private List<StockRate> stock_rates;
 
     public Company() {
     }

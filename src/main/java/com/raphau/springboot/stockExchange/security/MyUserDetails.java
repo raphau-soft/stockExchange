@@ -1,5 +1,6 @@
 package com.raphau.springboot.stockExchange.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.raphau.springboot.stockExchange.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,28 +9,64 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MyUserDetails implements UserDetails {
+    private static final long serialVersionUID = 1L;
 
-    private String userName;
+    private int id;
+    private String username;
+
+    private String email;
+    @JsonIgnore
     private String password;
-    private boolean active;
-    private List<GrantedAuthority> authorities;
 
-    public MyUserDetails(User user){
-        this.userName = user.getUsername();
-        this.password = user.getPassword();
-        this.active = true;
-        this.authorities = Arrays.stream(user.getRole().split(","))
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public MyUserDetails(int id, String username, String email, String password,
+                         Collection<? extends GrantedAuthority> authorities){
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.authorities = authorities;
+    }
+
+    public static MyUserDetails build(User user){
+        List<GrantedAuthority> authorities = Arrays.stream(user.getRole().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+
+        return new MyUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                authorities
+        );
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -39,7 +76,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return username;
     }
 
     @Override
@@ -59,6 +96,16 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        MyUserDetails user = (MyUserDetails) o;
+        return Objects.equals(id, user.id);
     }
 }

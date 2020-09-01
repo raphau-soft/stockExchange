@@ -2,20 +2,23 @@ package com.raphau.springboot.stockExchange.rest;
 
 import com.raphau.springboot.stockExchange.dao.BuyOfferRepository;
 import com.raphau.springboot.stockExchange.dao.SellOfferRepository;
+import com.raphau.springboot.stockExchange.dao.StockRateRepository;
 import com.raphau.springboot.stockExchange.dao.UserRepository;
 import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.dto.UserUpdDTO;
-import com.raphau.springboot.stockExchange.entity.BuyOffer;
-import com.raphau.springboot.stockExchange.entity.SellOffer;
-import com.raphau.springboot.stockExchange.entity.Stock;
-import com.raphau.springboot.stockExchange.entity.User;
+import com.raphau.springboot.stockExchange.entity.*;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.*;
 
 @RestController
@@ -29,12 +32,17 @@ public class UserRestController {
     private UserRepository userRepository;
 
     @Autowired
+    private StockRateRepository stockRateRepository;
+
+    @Autowired
     private SellOfferRepository sellOfferRepository;
 
     @Autowired
     private BuyOfferRepository buyOfferRepository;
 
     @GetMapping("/user")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Map<String, Object> find(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -47,14 +55,20 @@ public class UserRestController {
         if (!user.isPresent()){
             throw new RuntimeException("User not found");
         }
+
+        User userO = user.get();
+        userO.setPassword(null);
+
         Map<String, Object> objects = new HashMap<>();
-        objects.put("user", user.get());
+        objects.put("user", userO);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return objects;
     }
 
     @GetMapping("/user/buyOffers")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Map<String, Object> findBuyOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -68,7 +82,7 @@ public class UserRestController {
         if(userOpt.isPresent()){
             user = userOpt.get();
         } else return null;
-
+        user.setPassword(null);
         Map<String, Object> objects = new HashMap<>();
         objects.put("buyOffers", user.getBuyOffers());
         objects.put("testDetails", testDetailsDTO);
@@ -78,6 +92,8 @@ public class UserRestController {
     }
 
     @GetMapping("/user/resources")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Map<String, Object> findResources(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -94,8 +110,16 @@ public class UserRestController {
             user = userOpt.get();
         } else return null;
 
+        List<Stock> stocks = user.getStocks();
+        List<StockRate> stockRates = new ArrayList<>();
+
+        for (Stock stock : stocks) {
+            stockRates.add(stockRateRepository.findByCompanyAndActual(stock.getCompany(), true).get());
+        }
+
         Map<String, Object> objects = new HashMap<>();
-        objects.put("stock", user.getStocks());
+        objects.put("stock", stocks);
+        objects.put("stockRate", stockRates);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
@@ -103,6 +127,8 @@ public class UserRestController {
     }
 
     @GetMapping("/user/sellOffers")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Map<String, Object> findSellOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -132,6 +158,8 @@ public class UserRestController {
     }
 
     @DeleteMapping("user/sellOffers/{theId}")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public TestDetailsDTO deleteSellOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -158,6 +186,8 @@ public class UserRestController {
     }
 
     @DeleteMapping("user/buyOffers/{theId}")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public TestDetailsDTO deleteBuyOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -184,6 +214,8 @@ public class UserRestController {
     }
 
     @PutMapping("user/login")
+    @CrossOrigin(value = "*", maxAge = 3600)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public TestDetailsDTO updateUser(@RequestBody UserUpdDTO userUpdDTO){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();

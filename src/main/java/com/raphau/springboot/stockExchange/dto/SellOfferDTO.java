@@ -6,7 +6,7 @@ import java.sql.Date;
 public class SellOfferDTO {
 
     private int id;
-    private int stock_id;
+    private int company_id;
     private BigDecimal minPrice;
     private int amount;
     private Date dateLimit;
@@ -14,9 +14,9 @@ public class SellOfferDTO {
     public SellOfferDTO() {
     }
 
-    public SellOfferDTO(int id, int stock_id, BigDecimal minPrice, int amount, Date dateLimit) {
+    public SellOfferDTO(int id, int company_id, BigDecimal minPrice, int amount, Date dateLimit) {
         this.id = id;
-        this.stock_id = stock_id;
+        this.company_id = company_id;
         this.minPrice = minPrice;
         this.amount = amount;
         this.dateLimit = dateLimit;
@@ -30,12 +30,12 @@ public class SellOfferDTO {
         this.id = id;
     }
 
-    public int getStock_id() {
-        return stock_id;
+    public int getCompany_id() {
+        return company_id;
     }
 
-    public void setStock_id(int stock_id) {
-        this.stock_id = stock_id;
+    public void setCompany_id(int company_id) {
+        this.company_id = company_id;
     }
 
     public BigDecimal getMinPrice() {
@@ -66,7 +66,7 @@ public class SellOfferDTO {
     public String toString() {
         return "SellOfferDTO{" +
                 "id=" + id +
-                ", stock_id=" + stock_id +
+                ", company_id=" + company_id +
                 ", maxPrice=" + minPrice +
                 ", amount=" + amount +
                 ", dateLimit=" + dateLimit +
