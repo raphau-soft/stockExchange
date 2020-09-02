@@ -10,6 +10,7 @@ import com.raphau.springboot.stockExchange.entity.Company;
 import com.raphau.springboot.stockExchange.entity.User;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +34,7 @@ public class BuyOfferRestController {
     @PostMapping("/buyOffer")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO addOffer(@RequestBody BuyOfferDTO buyOfferDTO){
+    public ResponseEntity<?> addOffer(@RequestBody BuyOfferDTO buyOfferDTO){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -47,7 +48,8 @@ public class BuyOfferRestController {
         buyOfferRepository.save(buyOffer);
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return testDetailsDTO;
+
+        return ResponseEntity.ok(testDetailsDTO);
     }
 
 }

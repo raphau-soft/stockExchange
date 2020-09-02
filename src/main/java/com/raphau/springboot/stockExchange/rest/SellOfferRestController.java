@@ -12,12 +12,16 @@ import com.raphau.springboot.stockExchange.entity.User;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Optional;
 
 @RestController
@@ -39,31 +43,39 @@ public class SellOfferRestController {
     @PostMapping("/sellOffer")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) {
-        System.out.println("\n\n\n\n");
+    public ResponseEntity<?> addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) {
         long timeApp = System.currentTimeMillis();
+        Calendar c = Calendar.getInstance();
+        c.setTime(sellOfferDTO.getDateLimit());
+        c.add(Calendar.DATE, 1);
+        sellOfferDTO.setDateLimit(c.getTime());
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         sellOfferDTO.setId(0);
         long timeBase = System.currentTimeMillis();
-        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        Optional<User> userOpt = getUser();
         Optional<Company> companyOptional = companyRepository.findById(sellOfferDTO.getCompany_id());
         if(!companyOptional.isPresent() || !userOpt.isPresent()){
-            System.out.println("Nie ma firmy lub użytkownika");
-            return null;
+            return ResponseEntity.badRequest().body("Company or user doesn't exist");
         }
         Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(companyOptional.get(), userOpt.get());
         if(!stockOptional.isPresent()){
-            System.out.println("Nie ma akcji");
-            return null;
+            return ResponseEntity.badRequest().body("You are not the owner of this resource");
+        }
+        if(sellOfferDTO.getAmount() > stockOptional.get().getAmount()){
+            return ResponseEntity.badRequest().body("Wrong resources amount");
         }
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         SellOffer sellOffer = new SellOffer(sellOfferDTO, stockOptional.get());
         sellOfferRepository.save(sellOffer);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        System.out.println("\n\n\n\n");
-        return testDetailsDTO;
+        return ResponseEntity.ok(testDetailsDTO);
+    }
+
+    private Optional<User> getUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        return userOpt;
     }
 
 }

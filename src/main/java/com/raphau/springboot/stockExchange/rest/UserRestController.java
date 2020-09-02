@@ -10,15 +10,12 @@ import com.raphau.springboot.stockExchange.entity.*;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import java.util.*;
 
 @RestController
@@ -43,7 +40,7 @@ public class UserRestController {
     @GetMapping("/user")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public Map<String, Object> find(){
+    public ResponseEntity<?> find(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,13 +60,13 @@ public class UserRestController {
         objects.put("user", userO);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return objects;
+        return ResponseEntity.ok(objects);
     }
 
     @GetMapping("/user/buyOffers")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public Map<String, Object> findBuyOffers(){
+    public ResponseEntity<?> findBuyOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -88,13 +85,13 @@ public class UserRestController {
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
-        return objects;
+        return ResponseEntity.ok(objects);
     }
 
     @GetMapping("/user/resources")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public Map<String, Object> findResources(){
+    public ResponseEntity<?> findResources(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -123,13 +120,13 @@ public class UserRestController {
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
-        return objects;
+        return ResponseEntity.ok(objects);
     }
 
     @GetMapping("/user/sellOffers")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public Map<String, Object> findSellOffers(){
+    public ResponseEntity<?> findSellOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -147,20 +144,20 @@ public class UserRestController {
         List<SellOffer> sellOffers = new ArrayList<>();
         List<Stock> stocks = user.getStocks();
 
-        stocks.forEach(stock -> {sellOffers.addAll(stock.getSellOffers());});
+        stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
 
         Map<String, Object> objects = new HashMap<>();
         objects.put("sellOffers", sellOffers);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
-        return objects;
+        return ResponseEntity.ok(objects);
     }
 
     @DeleteMapping("user/sellOffers/{theId}")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO deleteSellOffer(@PathVariable int theId){
+    public ResponseEntity<?> deleteSellOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -182,13 +179,13 @@ public class UserRestController {
                 sellOfferRepository.deleteById(theId);
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return testDetailsDTO;
+        return ResponseEntity.ok(testDetailsDTO);
     }
 
     @DeleteMapping("user/buyOffers/{theId}")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO deleteBuyOffer(@PathVariable int theId){
+    public ResponseEntity<?> deleteBuyOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -210,13 +207,13 @@ public class UserRestController {
                 buyOfferRepository.deleteById(theId);
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return testDetailsDTO;
+        return ResponseEntity.ok(testDetailsDTO);
     }
 
     @PutMapping("user/login")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO updateUser(@RequestBody UserUpdDTO userUpdDTO){
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdDTO userUpdDTO){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -236,6 +233,6 @@ public class UserRestController {
 
         userRepository.save(user);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return testDetailsDTO;
+        return ResponseEntity.ok(testDetailsDTO);
     }
 }

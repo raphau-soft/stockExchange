@@ -12,13 +12,14 @@ import com.raphau.springboot.stockExchange.entity.User;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -39,14 +40,14 @@ public class CompanyRestController {
     @GetMapping("/companies")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public List<Company> findAllCompanies(){
-        return companyRepository.findAll();
+    public ResponseEntity<?> findAllCompanies(){
+        return new ResponseEntity<>(companyRepository.findAll(), HttpStatus.OK);
     }
 
     @PostMapping("/company")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public TestDetailsDTO addCompany(@RequestBody CompanyDTO companyDTO){
+    public ResponseEntity<?> addCompany(@RequestBody CompanyDTO companyDTO){
         // TODO: add company, stock, stock rate
         long timeApp = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -69,7 +70,7 @@ public class CompanyRestController {
 
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
-        return testDetailsDTO;
+        return ResponseEntity.ok(testDetailsDTO);
     }
 
 }
