@@ -1,5 +1,7 @@
 package com.raphau.springboot.stockExchange.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +16,7 @@ public class StockRate implements Serializable {
     private int id;
 
     // company
-    @ManyToOne(targetEntity = Company.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="company_id", nullable = false)
     private Company company;
 
@@ -76,5 +78,16 @@ public class StockRate implements Serializable {
 
     public void setActual(boolean actual) {
         this.actual = actual;
+    }
+
+    @Override
+    public String toString() {
+        return "StockRate{" +
+                "id=" + id +
+                ", company=" + company +
+                ", rate=" + rate +
+                ", date=" + date +
+                ", actual=" + actual +
+                '}';
     }
 }

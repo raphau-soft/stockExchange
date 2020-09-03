@@ -9,21 +9,22 @@ import com.raphau.springboot.stockExchange.entity.Company;
 import com.raphau.springboot.stockExchange.entity.Stock;
 import com.raphau.springboot.stockExchange.entity.StockRate;
 import com.raphau.springboot.stockExchange.entity.User;
+import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 
 @RestController
-public class CompanyRestController {
+public class CompanyRestController implements Serializable {
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -41,20 +42,19 @@ public class CompanyRestController {
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> findAllCompanies(){
-        return new ResponseEntity<>(companyRepository.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(companyRepository.findAll());
     }
 
     @PostMapping("/company")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyDTO companyDTO){
-        // TODO: add company, stock, stock rate
         long timeApp = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
         if (!userOpt.isPresent()){
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
         User user = userOpt.get();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();

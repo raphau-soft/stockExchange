@@ -9,6 +9,10 @@ import com.raphau.springboot.stockExchange.entity.Company;
 import com.raphau.springboot.stockExchange.entity.SellOffer;
 import com.raphau.springboot.stockExchange.entity.Stock;
 import com.raphau.springboot.stockExchange.entity.User;
+import com.raphau.springboot.stockExchange.exception.CompanyNotFoundException;
+import com.raphau.springboot.stockExchange.exception.StockAmountException;
+import com.raphau.springboot.stockExchange.exception.StockNotFoundException;
+import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Optional;
 
@@ -54,17 +55,24 @@ public class SellOfferRestController {
         long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = getUser();
         Optional<Company> companyOptional = companyRepository.findById(sellOfferDTO.getCompany_id());
-        if(!companyOptional.isPresent() || !userOpt.isPresent()){
-            return ResponseEntity.badRequest().body("Company or user doesn't exist");
+        if(!companyOptional.isPresent()){
+            throw new CompanyNotFoundException("Company with id " + sellOfferDTO.getCompany_id() + " not found");
+        }
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User not found");
         }
         Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(companyOptional.get(), userOpt.get());
         if(!stockOptional.isPresent()){
-            return ResponseEntity.badRequest().body("You are not the owner of this resource");
+            throw new StockNotFoundException("User " + userOpt.get().getUsername() + " doesn't have stocks of " + companyOptional.get().getName());
         }
-        if(sellOfferDTO.getAmount() > stockOptional.get().getAmount()){
-            return ResponseEntity.badRequest().body("Wrong resources amount");
+        Stock stock = stockOptional.get();
+        if(sellOfferDTO.getAmount() > stock.getAmount() || sellOfferDTO.getAmount() <= 0){
+            throw new StockAmountException("Wrong amount of resources");
         }
+        stock.setAmount(stock.getAmount() - sellOfferDTO.getAmount());
+        stockRepository.save(stock);
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
+
         SellOffer sellOffer = new SellOffer(sellOfferDTO, stockOptional.get());
         sellOfferRepository.save(sellOffer);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
@@ -74,8 +82,7 @@ public class SellOfferRestController {
     private Optional<User> getUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        return userOpt;
+        return userService.findByUsername(userDetails.getUsername());
     }
 
 }

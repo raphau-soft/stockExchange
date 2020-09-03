@@ -8,6 +8,9 @@ import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.entity.BuyOffer;
 import com.raphau.springboot.stockExchange.entity.Company;
 import com.raphau.springboot.stockExchange.entity.User;
+import com.raphau.springboot.stockExchange.exception.CompanyNotFoundException;
+import com.raphau.springboot.stockExchange.exception.NotEnoughMoneyException;
+import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Optional;
 
 @RestController
@@ -36,15 +41,33 @@ public class BuyOfferRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addOffer(@RequestBody BuyOfferDTO buyOfferDTO){
         long timeApp = System.currentTimeMillis();
+        Calendar c = Calendar.getInstance();
+        c.setTime(buyOfferDTO.getDateLimit());
+        c.add(Calendar.DATE, 1);
+        buyOfferDTO.setDateLimit(c.getTime());
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         long timeBase = System.currentTimeMillis();
-        Optional<User> user = userRepository.findByUsername(userDetails.getUsername());
-        Optional<Company> company = companyRepository.findById(buyOfferDTO.getCompany_id());
+        Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
+        Optional<Company> companyOptional = companyRepository.findById(buyOfferDTO.getCompany_id());
 
-        BuyOffer buyOffer = new BuyOffer(0, company.get(), user.get(),
+        if(!companyOptional.isPresent()){
+            throw new CompanyNotFoundException("Company with id " + buyOfferDTO.getCompany_id() + " not found");
+        }
+        if(!userOptional.isPresent()){
+            throw new UserNotFoundException("User" + userDetails.getUsername() + " not found");
+        }
+        User user = userOptional.get();
+        Company company = companyOptional.get();
+        if(user.getMoney().compareTo(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))) < 0){
+            throw new NotEnoughMoneyException("Not enough money");
+        }
+
+        BuyOffer buyOffer = new BuyOffer(0, company, user,
                 buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit());
+        user.setMoney(user.getMoney().subtract(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))));
+        userRepository.save(user);
         buyOfferRepository.save(buyOffer);
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);

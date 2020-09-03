@@ -1,12 +1,11 @@
 package com.raphau.springboot.stockExchange.rest;
 
-import com.raphau.springboot.stockExchange.dao.BuyOfferRepository;
-import com.raphau.springboot.stockExchange.dao.SellOfferRepository;
-import com.raphau.springboot.stockExchange.dao.StockRateRepository;
-import com.raphau.springboot.stockExchange.dao.UserRepository;
+import com.raphau.springboot.stockExchange.dao.*;
 import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.dto.UserUpdDTO;
 import com.raphau.springboot.stockExchange.entity.*;
+import com.raphau.springboot.stockExchange.exception.StockRateNotFoundException;
+import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @RestController
@@ -30,6 +30,9 @@ public class UserRestController {
 
     @Autowired
     private StockRateRepository stockRateRepository;
+
+    @Autowired
+    private StockRepository stockRepository;
 
     @Autowired
     private SellOfferRepository sellOfferRepository;
@@ -50,7 +53,7 @@ public class UserRestController {
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if (!user.isPresent()){
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
         User userO = user.get();
@@ -76,9 +79,13 @@ public class UserRestController {
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         User user;
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
+
+        user = userOpt.get();
+
+
         user.setPassword(null);
         Map<String, Object> objects = new HashMap<>();
         objects.put("buyOffers", user.getBuyOffers());
@@ -103,15 +110,21 @@ public class UserRestController {
 
         User user;
 
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
+
+        user = userOpt.get();
 
         List<Stock> stocks = user.getStocks();
         List<StockRate> stockRates = new ArrayList<>();
 
         for (Stock stock : stocks) {
-            stockRates.add(stockRateRepository.findByCompanyAndActual(stock.getCompany(), true).get());
+            Optional<StockRate> stockRate = stockRateRepository.findByCompanyAndActual(stock.getCompany(), true);
+            if(!stockRate.isPresent()){
+                throw new StockRateNotFoundException("Actual stock rate for " + stock.getCompany().getName() + " not found");
+            }
+            stockRates.add(stockRate.get());
         }
 
         Map<String, Object> objects = new HashMap<>();
@@ -137,9 +150,11 @@ public class UserRestController {
 
         User user;
 
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
+
+        user = userOpt.get();
 
         List<SellOffer> sellOffers = new ArrayList<>();
         List<Stock> stocks = user.getStocks();
@@ -168,15 +183,21 @@ public class UserRestController {
 
         User user;
 
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
 
+        user = userOpt.get();
         Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
 
         if(sellOfferOptional.isPresent()) {
-            if(sellOfferOptional.get().getStock().getUser().getId() == user.getId())
+            SellOffer sellOffer = sellOfferOptional.get();
+            Stock stock = sellOffer.getStock();
+            if(stock.getUser().getId() == user.getId()) {
+                stock.setAmount(stock.getAmount() + sellOffer.getAmount());
+                stockRepository.save(stock);
                 sellOfferRepository.deleteById(theId);
+            }
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
@@ -196,14 +217,15 @@ public class UserRestController {
 
         User user;
 
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
-
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
+        user = userOpt.get();
         Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
             if(user.getId() == buyOfferOptional.get().getUser().getId())
+                user.setMoney(user.getMoney().add(buyOfferOptional.get().getMaxPrice().multiply(BigDecimal.valueOf(buyOfferOptional.get().getAmount()))));
                 buyOfferRepository.deleteById(theId);
         }
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
@@ -224,9 +246,11 @@ public class UserRestController {
 
         User user;
 
-        if(userOpt.isPresent()){
-            user = userOpt.get();
-        } else return null;
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
+        }
+
+        user = userOpt.get();
 
         user.setUsername(userUpdDTO.getUsername());
         user.setPassword(userUpdDTO.getPassword());
@@ -235,4 +259,25 @@ public class UserRestController {
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
