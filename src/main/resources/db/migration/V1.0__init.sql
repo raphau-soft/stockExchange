@@ -32,8 +32,10 @@ CREATE TABLE IF NOT EXISTS `buy_offer`(
     `company_id` int(11) NOT NULL,
     `user_id` int(11) NOT NULL,
     `max_price` float(45) NOT NULL,
+    `start_amount` int(11) NOT NULL,
     `amount` int(11) NOT NULL,
     `date_limit` date NOT NULL,
+    `actual` boolean DEFAULT true,
     PRIMARY KEY(`id`),
     FOREIGN KEY(`company_id`) REFERENCES `company`(`id`),
     FOREIGN KEY(`user_id`) REFERENCES `user`(`id`)
@@ -43,8 +45,10 @@ CREATE TABLE IF NOT EXISTS `sell_offer`(
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `stock_id` int(11) NOT NULL,
     `min_price` float(45) NOT NULL,
+    `start_amount` int(11) NOT NULL,
     `amount` int(11) NOT NULL,
     `date_limit` date NOT NULL,
+    `actual` boolean DEFAULT true,
     PRIMARY KEY(`id`),
     FOREIGN KEY(`stock_id`) REFERENCES `stock`(`id`)
 );

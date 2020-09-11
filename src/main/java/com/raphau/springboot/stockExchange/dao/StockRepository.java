@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface StockRepository extends JpaRepository<Stock, Integer> {
 
     List<Stock> findByUser(User user);
+    List<Stock> findByCompany_Id(int company_Id);
     Optional<Stock> findByCompanyAndUser(Company company, User user);
 
 }

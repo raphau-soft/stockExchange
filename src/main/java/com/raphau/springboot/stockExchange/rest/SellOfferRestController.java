@@ -14,6 +14,7 @@ import com.raphau.springboot.stockExchange.exception.StockAmountException;
 import com.raphau.springboot.stockExchange.exception.StockNotFoundException;
 import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
+import com.raphau.springboot.stockExchange.service.TradeServiceImpl;
 import com.raphau.springboot.stockExchange.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,9 @@ import java.util.Optional;
 public class SellOfferRestController {
 
     @Autowired
+    private TradeServiceImpl tradeService;
+
+    @Autowired
     private StockRepository stockRepository;
 
     @Autowired
@@ -44,8 +48,9 @@ public class SellOfferRestController {
     @PostMapping("/sellOffer")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) {
+    public ResponseEntity<?> addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) throws InterruptedException {
         long timeApp = System.currentTimeMillis();
+
         Calendar c = Calendar.getInstance();
         c.setTime(sellOfferDTO.getDateLimit());
         c.add(Calendar.DATE, 1);
@@ -71,10 +76,10 @@ public class SellOfferRestController {
         }
         stock.setAmount(stock.getAmount() - sellOfferDTO.getAmount());
         stockRepository.save(stock);
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
         SellOffer sellOffer = new SellOffer(sellOfferDTO, stockOptional.get());
         sellOfferRepository.save(sellOffer);
+        tradeService.trade(sellOfferDTO.getCompany_id());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }

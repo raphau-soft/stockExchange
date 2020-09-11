@@ -50,6 +50,7 @@ public class CompanyRestController implements Serializable {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyDTO companyDTO){
         long timeApp = System.currentTimeMillis();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
@@ -62,7 +63,7 @@ public class CompanyRestController implements Serializable {
         Company company = new Company(companyDTO.getId(), companyDTO.getName());
         Stock stock = new Stock(0, user, company, companyDTO.getAmount());
         StockRate stockRate = new StockRate(0, company, companyDTO.getPrice(), new Date(), true);
-        long timeBase = System.currentTimeMillis();
+
         companyRepository.save(company);
         stockRepository.save(stock);
         stockRateRepository.save(stockRate);

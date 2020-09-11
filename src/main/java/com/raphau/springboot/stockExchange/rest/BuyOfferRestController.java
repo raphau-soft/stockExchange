@@ -12,6 +12,7 @@ import com.raphau.springboot.stockExchange.exception.CompanyNotFoundException;
 import com.raphau.springboot.stockExchange.exception.NotEnoughMoneyException;
 import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
+import com.raphau.springboot.stockExchange.service.TradeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,9 @@ import java.util.Optional;
 public class BuyOfferRestController {
 
     @Autowired
+    private TradeServiceImpl tradeService;
+
+    @Autowired
     private BuyOfferRepository buyOfferRepository;
 
     @Autowired
@@ -39,16 +43,17 @@ public class BuyOfferRestController {
     @PostMapping("/buyOffer")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> addOffer(@RequestBody BuyOfferDTO buyOfferDTO){
+    public ResponseEntity<?> addOffer(@RequestBody BuyOfferDTO buyOfferDTO) throws InterruptedException {
         long timeApp = System.currentTimeMillis();
+
         Calendar c = Calendar.getInstance();
         c.setTime(buyOfferDTO.getDateLimit());
         c.add(Calendar.DATE, 1);
         buyOfferDTO.setDateLimit(c.getTime());
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
         Optional<Company> companyOptional = companyRepository.findById(buyOfferDTO.getCompany_id());
 
@@ -65,10 +70,11 @@ public class BuyOfferRestController {
         }
 
         BuyOffer buyOffer = new BuyOffer(0, company, user,
-                buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit());
+                buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit(), true);
         user.setMoney(user.getMoney().subtract(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))));
         userRepository.save(user);
         buyOfferRepository.save(buyOffer);
+        tradeService.trade(buyOfferDTO.getCompany_id());
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 

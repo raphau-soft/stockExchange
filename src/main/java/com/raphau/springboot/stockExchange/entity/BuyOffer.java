@@ -32,22 +32,54 @@ public class BuyOffer implements Serializable {
     @Column(name="max_price")
     private BigDecimal maxPrice;
 
+    @Column(name="start_amount")
+    private int startAmount;
+
     @Column(name="amount")
     private int amount;
 
     @Column(name="date_limit")
     private Date dateLimit;
 
+    @Column(name="actual")
+    private boolean actual;
+
     public BuyOffer() {
     }
 
-    public BuyOffer(int id, Company company, User user, BigDecimal maxPrice, int amount, Date dateLimit) {
+    public BuyOffer(int id, Company company, User user, BigDecimal maxPrice, int startAmount, int amount, Date dateLimit, boolean actual) {
         this.id = id;
         this.company = company;
         this.user = user;
         this.maxPrice = maxPrice;
+        this.startAmount = startAmount;
         this.amount = amount;
         this.dateLimit = dateLimit;
+        this.actual = actual;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    public int getStartAmount() {
+        return startAmount;
+    }
+
+    public void setStartAmount(int startAmount) {
+        this.startAmount = startAmount;
+    }
+
+    public boolean isActual() {
+        return actual;
+    }
+
+    public void setActual(boolean actual) {
+        this.actual = actual;
     }
 
     public int getId() {
@@ -100,13 +132,13 @@ public class BuyOffer implements Serializable {
 
     @Override
     public String toString() {
-        return "BuyOffer{" +
+        return "\n\nBuyOffer{" +
                 "id=" + id +
-                ", company=" + company +
-                ", user=" + user +
+                ", company=" + company.getId() +
+                ", user=" + user.getId() +
                 ", maxPrice=" + maxPrice +
                 ", amount=" + amount +
                 ", dateLimit=" + dateLimit +
-                '}';
+                "}\n\n";
     }
 }

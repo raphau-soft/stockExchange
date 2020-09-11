@@ -11,5 +11,7 @@ import java.util.List;
 public interface BuyOfferRepository extends JpaRepository<BuyOffer, Integer> {
 
     List<BuyOffer> findByUser(User user);
+    List<BuyOffer> findByCompany_Id(int company_id);
+    List<BuyOffer> findByCompany_IdAndActual(int company_id, Boolean actual);
 
 }

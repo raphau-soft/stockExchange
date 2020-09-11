@@ -46,21 +46,21 @@ public class UserRestController {
     public ResponseEntity<?> find(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
-        Optional<User> user = userService.findByUsername(userDetails.getUsername());
+        Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
-        if (!user.isPresent()){
+        if (!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
-        User userO = user.get();
-        userO.setPassword(null);
+        User user = userOpt.get();
+        user.setPassword(null);
 
         Map<String, Object> objects = new HashMap<>();
-        objects.put("user", userO);
+        objects.put("user", user);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(objects);
@@ -72,19 +72,17 @@ public class UserRestController {
     public ResponseEntity<?> findBuyOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
-        User user;
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
-        user = userOpt.get();
-
+        User user = userOpt.get();
 
         user.setPassword(null);
         Map<String, Object> objects = new HashMap<>();
@@ -101,21 +99,15 @@ public class UserRestController {
     public ResponseEntity<?> findResources(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        User user;
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
-
-        user = userOpt.get();
-
+        User user = userOpt.get();
         List<Stock> stocks = user.getStocks();
         List<StockRate> stockRates = new ArrayList<>();
 
@@ -126,6 +118,7 @@ public class UserRestController {
             }
             stockRates.add(stockRate.get());
         }
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         Map<String, Object> objects = new HashMap<>();
         objects.put("stock", stocks);
@@ -142,25 +135,22 @@ public class UserRestController {
     public ResponseEntity<?> findSellOffers(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        User user;
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
-        user = userOpt.get();
+        User user = userOpt.get();
 
         List<SellOffer> sellOffers = new ArrayList<>();
         List<Stock> stocks = user.getStocks();
 
         stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
-
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         Map<String, Object> objects = new HashMap<>();
         objects.put("sellOffers", sellOffers);
         objects.put("testDetails", testDetailsDTO);
@@ -175,19 +165,16 @@ public class UserRestController {
     public ResponseEntity<?> deleteSellOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        User user;
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
-        user = userOpt.get();
+        User user = userOpt.get();
         Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
 
         if(sellOfferOptional.isPresent()) {
@@ -199,6 +186,7 @@ public class UserRestController {
                 sellOfferRepository.deleteById(theId);
             }
         }
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
@@ -209,18 +197,15 @@ public class UserRestController {
     public ResponseEntity<?> deleteBuyOffer(@PathVariable int theId){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        User user;
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
-        user = userOpt.get();
+        User user = userOpt.get();
         Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
@@ -228,6 +213,7 @@ public class UserRestController {
                 user.setMoney(user.getMoney().add(buyOfferOptional.get().getMaxPrice().multiply(BigDecimal.valueOf(buyOfferOptional.get().getAmount()))));
                 buyOfferRepository.deleteById(theId);
         }
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
@@ -238,24 +224,22 @@ public class UserRestController {
     public ResponseEntity<?> updateUser(@RequestBody UserUpdDTO userUpdDTO){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
+        long timeBase = System.currentTimeMillis();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        User user;
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
-        user = userOpt.get();
+        User user = userOpt.get();
 
         user.setUsername(userUpdDTO.getUsername());
         user.setPassword(userUpdDTO.getPassword());
 
         userRepository.save(user);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
