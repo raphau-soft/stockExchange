@@ -13,11 +13,11 @@ public class Transaction implements Serializable {
     @Column(name="id")
     private int id;
 
-    @ManyToOne(targetEntity = BuyOffer.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = BuyOffer.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="buy_offer_id", nullable = false)
     private BuyOffer buyOffer;
 
-    @ManyToOne(targetEntity = SellOffer.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = SellOffer.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="sell_offer_id", nullable = false)
     private SellOffer sellOffer;
 

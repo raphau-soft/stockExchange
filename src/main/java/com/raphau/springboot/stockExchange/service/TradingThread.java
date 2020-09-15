@@ -19,13 +19,15 @@ public class TradingThread implements Runnable {
     private SellOfferRepository sellOfferRepository;
     private UserRepository userRepository;
     private TransactionRepository transactionRepository;
+    private StockRateRepository stockRateRepository;
     private List<BuyOffer>  buyOffers = new ArrayList<>();
     private List<SellOffer>  sellOffers = new ArrayList<>();
     private List<Stock>  stocks = new ArrayList<>();
 
     public TradingThread(int companyId, Semaphore semaphore, BuyOfferRepository buyOfferRepository,
                          StockRepository stockRepository, SellOfferRepository sellOfferRepository,
-                         UserRepository userRepository, TransactionRepository transactionRepository){
+                         UserRepository userRepository, TransactionRepository transactionRepository,
+                         StockRateRepository stockRateRepository){
         this.companyId = companyId;
         this.semaphore = semaphore;
         this.buyOfferRepository = buyOfferRepository;
@@ -33,6 +35,7 @@ public class TradingThread implements Runnable {
         this.sellOfferRepository = sellOfferRepository;
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
+        this.stockRateRepository = stockRateRepository;
     }
 
     @Override
@@ -51,14 +54,17 @@ public class TradingThread implements Runnable {
             // sort'em
             buyOffers.sort(new SortBuyOffers());
             sellOffers.sort(new SortSellOffers());
+            List<Transaction> transactions = new ArrayList<>();
             // trade with two variants (more stocks on sell/buy offer)
-//            while(buyOffers.size() >= OFFERS_NUMBER && sellOffers.size() >= OFFERS_NUMBER &&
-//                    startTrading(buyOffers.subList(0, OFFERS_NUMBER), sellOffers.subList(0, OFFERS_NUMBER))){
-//                System.out.println(buyOffers.size() + " - " + sellOffers.size());
-//            };
-            // update stock rate
+            while(buyOffers.size() >= OFFERS_NUMBER && sellOffers.size() >= OFFERS_NUMBER){
+                if(!startTrading(buyOffers.subList(0, OFFERS_NUMBER), sellOffers.subList(0, OFFERS_NUMBER), transactions)) break;
+                sellOffers.removeIf(sellOffer -> !sellOffer.isActual());
+                buyOffers.removeIf(buyOffer -> !buyOffer.isActual());
+            }
 
-            // はじめまして
+            // update stock rate
+            if(!transactions.isEmpty())
+                updateStockRates(companyId, transactions);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -67,26 +73,92 @@ public class TradingThread implements Runnable {
         }
     }
 
-    private boolean startTrading(List<BuyOffer> buyOffers, List<SellOffer> sellOffers) {
-        for (SellOffer sellOffer : sellOffers) {
-            for (BuyOffer buyOffer : buyOffers) {
-                if (sellOffer.getMinPrice().compareTo(buyOffer.getMaxPrice()) < 0) {
-                    if (sellOffer.getAmount() < buyOffer.getAmount()) {
-                        buyOfferStay(buyOffer, sellOffer);
-                        sellOffers.remove(sellOffer);
-                    } else if(sellOffer.getAmount() > buyOffer.getAmount()){
-                        sellOfferStay(buyOffer, sellOffer);
-                        buyOffers.remove(buyOffer);
-                    }
-                } else {
-                    return false;
-                }
+    private void updateStockRates(int companyId, List<Transaction> transactions){
+        double price = 0;
+        int amount = 0;
+        for(Transaction transaction: transactions){
+            price += transaction.getPrice() * transaction.getAmount();
+            amount += transaction.getAmount();
+        }
+
+        double average = price / amount;
+        Optional<StockRate> stockRateOptional = stockRateRepository.findByCompany_IdAndActual(companyId, true);
+
+        if(stockRateOptional.isPresent()){
+            StockRate stockRate = stockRateOptional.get();
+            double dif = average - stockRate.getRate();
+            dif = dif/10;
+            double newPrice = stockRate.getRate() + dif;
+            newPrice = Math.round(newPrice*100) / 100.0;
+            StockRate newStockRate = new StockRate(0, stockRate.getCompany(), newPrice, new Date(), true);
+            stockRate.setActual(false);
+            stockRateRepository.save(stockRate);
+            stockRateRepository.save(newStockRate);
+        }
+
+    }
+
+    private boolean startTrading(List<BuyOffer> buyOffers, List<SellOffer> sellOffers, List<Transaction> transactions) {
+        BuyOffer buyOffer;
+        SellOffer sellOffer;
+        int i=0,j=0;
+        while(i < buyOffers.size() && j < sellOffers.size()){
+            buyOffer = buyOffers.get(i);
+            sellOffer = sellOffers.get(j);
+            if(buyOffer.getMaxPrice().compareTo(sellOffer.getMinPrice()) < 0) return false;
+            if(buyOffer.getAmount() > sellOffer.getAmount()){
+                transactions.add(buyOfferStay(buyOffer, sellOffer));
+                j++;
+            } else if (buyOffer.getAmount() < sellOffer.getAmount()){
+                transactions.add(sellOfferStay(buyOffer, sellOffer));
+                i++;
+            } else {
+                transactions.add(noneOfferStay(buyOffer,sellOffer));
+                i++;j++;
             }
         }
+
+
+//        for(int i = 0; i < buyOffers.size();){
+//            buyOffer = buyOffers.get(i);
+//            for(int j = 0; j < sellOffers.size();){
+//                sellOffer = sellOffers.get(j);
+//                if(!sellOffer.isActual()) continue;
+//                if(buyOffer.getMaxPrice().compareTo(sellOffer.getMinPrice()) < 0) return false;
+//                if(buyOffer.getAmount() > sellOffer.getAmount()){
+//                    buyOfferStay(buyOffer, sellOffer);
+//                    j++;
+//                } else if (buyOffer.getAmount() < sellOffer.getAmount()){
+//                    sellOfferStay(buyOffer, sellOffer);
+//                    i++;
+//                } else {
+//                    noneOfferStay(buyOffer,sellOffer);
+//                    i++;j++;
+//                }
+//            }
+//        }
         return true;
     }
 
-    private void buyOfferStay(BuyOffer buyOffer, SellOffer sellOffer){
+    private Transaction noneOfferStay(BuyOffer buyOffer, SellOffer sellOffer){
+        double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
+        Transaction transaction = new Transaction(0, buyOffer, sellOffer, sellOffer.getAmount(), price, new Date());
+        User sellOfferOwner = sellOffer.getStock().getUser();
+        User buyOfferOwner = buyOffer.getUser();
+        buyOfferOwner.setMoney(buyOfferOwner.getMoney().add(buyOffer.getMaxPrice()
+                .subtract(new BigDecimal(price)).multiply(new BigDecimal(sellOffer.getAmount()))));
+        sellOfferOwner.setMoney(sellOfferOwner.getMoney().add(new BigDecimal(price * sellOffer.getAmount())));
+        buyOffer.setAmount(0);
+        buyOffer.setActual(false);
+        sellOffer.setAmount(0);
+        sellOffer.setActual(false);
+        transactionRepository.save(transaction);
+        buyOfferRepository.save(buyOffer);
+        sellOfferRepository.save(sellOffer);
+        return transaction;
+    }
+
+    private Transaction buyOfferStay(BuyOffer buyOffer, SellOffer sellOffer){
         double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
         Transaction transaction = new Transaction(0, buyOffer, sellOffer, sellOffer.getAmount(), price, new Date());
         User sellOfferOwner = sellOffer.getStock().getUser();
@@ -100,8 +172,9 @@ public class TradingThread implements Runnable {
         transactionRepository.save(transaction);
         buyOfferRepository.save(buyOffer);
         sellOfferRepository.save(sellOffer);
+        return transaction;
     }
-    private void sellOfferStay(BuyOffer buyOffer, SellOffer sellOffer){
+    private Transaction sellOfferStay(BuyOffer buyOffer, SellOffer sellOffer){
         double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
         Transaction transaction = new Transaction(0, buyOffer, sellOffer, buyOffer.getAmount(), price, new Date());
         User sellOfferOwner = sellOffer.getStock().getUser();
@@ -115,6 +188,7 @@ public class TradingThread implements Runnable {
         transactionRepository.save(transaction);
         sellOfferRepository.save(sellOffer);
         buyOfferRepository.save(buyOffer);
+        return transaction;
     }
 
     private void getBuyOffers(){

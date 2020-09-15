@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface StockRateRepository extends JpaRepository<StockRate, Integer> {
     Optional<StockRate> findByCompanyAndActual(Company company, Boolean actual);
+    Optional<StockRate> findByCompany_IdAndActual(int company_id, Boolean actual);
     List<StockRate> findByActual(Boolean actual);
 }

@@ -23,6 +23,8 @@ public class TradeServiceImpl {
 
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private StockRateRepository stockRateRepository;
 
     @Autowired
     private SellOfferRepository sellOfferRepository;
@@ -30,7 +32,7 @@ public class TradeServiceImpl {
     public void trade(int companyId) throws InterruptedException {
         createSemaphore(companyId);
         TradingThread thread = new TradingThread(companyId, companySemaphores.get(companyId), buyOfferRepository,
-                stockRepository, sellOfferRepository, userRepository, transactionRepository);
+                stockRepository, sellOfferRepository, userRepository, transactionRepository, stockRateRepository);
         thread.run();
     }
 

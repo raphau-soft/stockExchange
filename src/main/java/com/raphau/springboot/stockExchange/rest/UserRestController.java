@@ -85,8 +85,10 @@ public class UserRestController {
         User user = userOpt.get();
 
         user.setPassword(null);
+        List<BuyOffer> buyOffers = user.getBuyOffers();
+        buyOffers.removeIf(buyOffer -> !buyOffer.isActual());
         Map<String, Object> objects = new HashMap<>();
-        objects.put("buyOffers", user.getBuyOffers());
+        objects.put("buyOffers", buyOffers);
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
@@ -150,6 +152,7 @@ public class UserRestController {
         List<Stock> stocks = user.getStocks();
 
         stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
+        sellOffers.removeIf(sellOffer -> !sellOffer.isActual());
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         Map<String, Object> objects = new HashMap<>();
         objects.put("sellOffers", sellOffers);
@@ -183,7 +186,8 @@ public class UserRestController {
             if(stock.getUser().getId() == user.getId()) {
                 stock.setAmount(stock.getAmount() + sellOffer.getAmount());
                 stockRepository.save(stock);
-                sellOfferRepository.deleteById(theId);
+                sellOffer.setActual(false);
+                sellOfferRepository.save(sellOffer);
             }
         }
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
@@ -209,9 +213,12 @@ public class UserRestController {
         Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
-            if(user.getId() == buyOfferOptional.get().getUser().getId())
-                user.setMoney(user.getMoney().add(buyOfferOptional.get().getMaxPrice().multiply(BigDecimal.valueOf(buyOfferOptional.get().getAmount()))));
-                buyOfferRepository.deleteById(theId);
+            BuyOffer buyOffer = buyOfferOptional.get();
+            if(user.getId() == buyOffer.getUser().getId()) {
+                user.setMoney(user.getMoney().add(buyOffer.getMaxPrice().multiply(BigDecimal.valueOf(buyOffer.getAmount()))));
+                buyOffer.setActual(false);
+                buyOfferRepository.save(buyOffer);
+            }
         }
         testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);

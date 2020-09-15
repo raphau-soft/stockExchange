@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.util.List;
 
 @RestController
-public class TransactionController {
+public class TransactionController implements Serializable {
 
     @Autowired
     private TransactionRepository transactionRepository;
