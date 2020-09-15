@@ -50,7 +50,6 @@ public class SellOfferRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addSellOffer(@RequestBody SellOfferDTO sellOfferDTO) throws InterruptedException {
         long timeApp = System.currentTimeMillis();
-
         Calendar c = Calendar.getInstance();
         c.setTime(sellOfferDTO.getDateLimit());
         c.add(Calendar.DATE, 1);
@@ -60,6 +59,7 @@ public class SellOfferRestController {
         long timeBase = System.currentTimeMillis();
         Optional<User> userOpt = getUser();
         Optional<Company> companyOptional = companyRepository.findById(sellOfferDTO.getCompany_id());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         if(!companyOptional.isPresent()){
             throw new CompanyNotFoundException("Company with id " + sellOfferDTO.getCompany_id() + " not found");
         }
@@ -75,11 +75,13 @@ public class SellOfferRestController {
             throw new StockAmountException("Wrong amount of resources");
         }
         stock.setAmount(stock.getAmount() - sellOfferDTO.getAmount());
+        SellOffer sellOffer = new SellOffer(sellOfferDTO, stock);
+        timeBase = System.currentTimeMillis();
         stockRepository.save(stock);
-        SellOffer sellOffer = new SellOffer(sellOfferDTO, stockOptional.get());
         sellOfferRepository.save(sellOffer);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
         tradeService.trade(sellOfferDTO.getCompany_id());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
+
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }

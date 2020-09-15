@@ -105,6 +105,7 @@ public class UserRestController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
@@ -114,13 +115,14 @@ public class UserRestController {
         List<StockRate> stockRates = new ArrayList<>();
 
         for (Stock stock : stocks) {
+            timeBase = System.currentTimeMillis();
             Optional<StockRate> stockRate = stockRateRepository.findByCompanyAndActual(stock.getCompany(), true);
+            testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
             if(!stockRate.isPresent()){
                 throw new StockRateNotFoundException("Actual stock rate for " + stock.getCompany().getName() + " not found");
             }
             stockRates.add(stockRate.get());
         }
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         Map<String, Object> objects = new HashMap<>();
         objects.put("stock", stocks);
@@ -141,6 +143,7 @@ public class UserRestController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
@@ -153,7 +156,7 @@ public class UserRestController {
 
         stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
         sellOffers.removeIf(sellOffer -> !sellOffer.isActual());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
+
         Map<String, Object> objects = new HashMap<>();
         objects.put("sellOffers", sellOffers);
         objects.put("testDetails", testDetailsDTO);
@@ -172,25 +175,26 @@ public class UserRestController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
-
+        Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
 
         User user = userOpt.get();
-        Optional<SellOffer> sellOfferOptional = sellOfferRepository.findById(theId);
 
         if(sellOfferOptional.isPresent()) {
             SellOffer sellOffer = sellOfferOptional.get();
             Stock stock = sellOffer.getStock();
             if(stock.getUser().getId() == user.getId()) {
                 stock.setAmount(stock.getAmount() + sellOffer.getAmount());
-                stockRepository.save(stock);
                 sellOffer.setActual(false);
+                timeBase = System.currentTimeMillis();
+                stockRepository.save(stock);
                 sellOfferRepository.save(sellOffer);
+                testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
             }
         }
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
@@ -205,22 +209,24 @@ public class UserRestController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
         }
         User user = userOpt.get();
-        Optional<BuyOffer> buyOfferOptional = buyOfferRepository.findById(theId);
 
         if(buyOfferOptional.isPresent()) {
             BuyOffer buyOffer = buyOfferOptional.get();
             if(user.getId() == buyOffer.getUser().getId()) {
                 user.setMoney(user.getMoney().add(buyOffer.getMaxPrice().multiply(BigDecimal.valueOf(buyOffer.getAmount()))));
                 buyOffer.setActual(false);
+                timeBase = System.currentTimeMillis();
                 buyOfferRepository.save(buyOffer);
+                testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
             }
         }
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }
@@ -235,6 +241,7 @@ public class UserRestController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOpt = userService.findByUsername(userDetails.getUsername());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if(!userOpt.isPresent()){
             throw new UserNotFoundException("User " + userDetails.getUsername() + " not found");
@@ -245,8 +252,10 @@ public class UserRestController {
         user.setUsername(userUpdDTO.getUsername());
         user.setPassword(userUpdDTO.getPassword());
 
+        timeBase = System.currentTimeMillis();
         userRepository.save(user);
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
+
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return ResponseEntity.ok(testDetailsDTO);
     }

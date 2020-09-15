@@ -3,7 +3,6 @@ package com.raphau.springboot.stockExchange.service;
 import com.raphau.springboot.stockExchange.dao.*;
 import com.raphau.springboot.stockExchange.entity.*;
 
-import javax.jws.soap.SOAPBinding;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -12,17 +11,16 @@ public class TradingThread implements Runnable {
 
     private final int OFFERS_NUMBER = 5;
 
-    private int companyId;
-    private Semaphore semaphore;
-    private BuyOfferRepository buyOfferRepository;
-    private StockRepository stockRepository;
-    private SellOfferRepository sellOfferRepository;
-    private UserRepository userRepository;
-    private TransactionRepository transactionRepository;
-    private StockRateRepository stockRateRepository;
+    private final int companyId;
+    private final Semaphore semaphore;
+    private final BuyOfferRepository buyOfferRepository;
+    private final StockRepository stockRepository;
+    private final SellOfferRepository sellOfferRepository;
+    private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
+    private final StockRateRepository stockRateRepository;
     private List<BuyOffer>  buyOffers = new ArrayList<>();
-    private List<SellOffer>  sellOffers = new ArrayList<>();
-    private List<Stock>  stocks = new ArrayList<>();
+    private final List<SellOffer>  sellOffers = new ArrayList<>();
 
     public TradingThread(int companyId, Semaphore semaphore, BuyOfferRepository buyOfferRepository,
                          StockRepository stockRepository, SellOfferRepository sellOfferRepository,
@@ -148,10 +146,20 @@ public class TradingThread implements Runnable {
         buyOfferOwner.setMoney(buyOfferOwner.getMoney().add(buyOffer.getMaxPrice()
                 .subtract(new BigDecimal(price)).multiply(new BigDecimal(sellOffer.getAmount()))));
         sellOfferOwner.setMoney(sellOfferOwner.getMoney().add(new BigDecimal(price * sellOffer.getAmount())));
+        Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(buyOffer.getCompany(), buyOfferOwner);
+        Stock stock;
+        if(!stockOptional.isPresent()) {
+            stock = new Stock(0, buyOfferOwner, buyOffer.getCompany(), sellOffer.getAmount());
+        } else {
+            stock = stockOptional.get();
+            stock.setAmount(stock.getAmount() + sellOffer.getAmount());
+        }
         buyOffer.setAmount(0);
         buyOffer.setActual(false);
         sellOffer.setAmount(0);
         sellOffer.setActual(false);
+        System.out.println("\n\n\n Saved stock " + stock.toString() + "\n\n\n");
+        stockRepository.save(stock);
         transactionRepository.save(transaction);
         buyOfferRepository.save(buyOffer);
         sellOfferRepository.save(sellOffer);
@@ -166,9 +174,18 @@ public class TradingThread implements Runnable {
         buyOfferOwner.setMoney(buyOfferOwner.getMoney().add(buyOffer.getMaxPrice()
                 .subtract(new BigDecimal(price)).multiply(new BigDecimal(sellOffer.getAmount()))));
         sellOfferOwner.setMoney(sellOfferOwner.getMoney().add(new BigDecimal(price * sellOffer.getAmount())));
+        Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(buyOffer.getCompany(), buyOfferOwner);
+        Stock stock;
+        if(!stockOptional.isPresent()) {
+            stock = new Stock(0, buyOfferOwner, buyOffer.getCompany(), sellOffer.getAmount());
+        } else {
+            stock = stockOptional.get();
+            stock.setAmount(stock.getAmount() + sellOffer.getAmount());
+        }
         buyOffer.setAmount(buyOffer.getAmount() - sellOffer.getAmount());
         sellOffer.setAmount(0);
         sellOffer.setActual(false);
+        stockRepository.save(stock);
         transactionRepository.save(transaction);
         buyOfferRepository.save(buyOffer);
         sellOfferRepository.save(sellOffer);
@@ -182,9 +199,18 @@ public class TradingThread implements Runnable {
         buyOfferOwner.setMoney(buyOfferOwner.getMoney().add(buyOffer.getMaxPrice()
                 .subtract(new BigDecimal(price)).multiply(new BigDecimal(buyOffer.getAmount()))));
         sellOfferOwner.setMoney(sellOfferOwner.getMoney().add(new BigDecimal(price * buyOffer.getAmount())));
+        Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(buyOffer.getCompany(), buyOfferOwner);
+        Stock stock;
+        if(!stockOptional.isPresent()) {
+            stock = new Stock(0, buyOfferOwner, buyOffer.getCompany(), buyOffer.getAmount());
+        } else {
+            stock = stockOptional.get();
+            stock.setAmount(stock.getAmount() + buyOffer.getAmount());
+        }
         sellOffer.setAmount(sellOffer.getAmount() - buyOffer.getAmount());
         buyOffer.setAmount(0);
         buyOffer.setActual(false);
+        stockRepository.save(stock);
         transactionRepository.save(transaction);
         sellOfferRepository.save(sellOffer);
         buyOfferRepository.save(buyOffer);
@@ -196,7 +222,7 @@ public class TradingThread implements Runnable {
     }
 
     private void getSellOffers(){
-        stocks = stockRepository.findByCompany_Id(companyId);
+        List<Stock> stocks = stockRepository.findByCompany_Id(companyId);
         stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
         sellOffers.removeIf(sellOffer -> !sellOffer.isActual());
     }
@@ -207,7 +233,7 @@ public class TradingThread implements Runnable {
         }
     }
 
-    class SortSellOffers implements Comparator<SellOffer>{
+    static class SortSellOffers implements Comparator<SellOffer>{
         public int compare(SellOffer a, SellOffer b){
             return a.getMinPrice().compareTo(b.getMinPrice());
         }

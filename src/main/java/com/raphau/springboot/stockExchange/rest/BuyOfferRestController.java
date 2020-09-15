@@ -45,7 +45,6 @@ public class BuyOfferRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addOffer(@RequestBody BuyOfferDTO buyOfferDTO) throws InterruptedException {
         long timeApp = System.currentTimeMillis();
-
         Calendar c = Calendar.getInstance();
         c.setTime(buyOfferDTO.getDateLimit());
         c.add(Calendar.DATE, 1);
@@ -56,6 +55,7 @@ public class BuyOfferRestController {
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
         Optional<Company> companyOptional = companyRepository.findById(buyOfferDTO.getCompany_id());
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
 
         if(!companyOptional.isPresent()){
             throw new CompanyNotFoundException("Company with id " + buyOfferDTO.getCompany_id() + " not found");
@@ -72,10 +72,12 @@ public class BuyOfferRestController {
         BuyOffer buyOffer = new BuyOffer(0, company, user,
                 buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit(), true);
         user.setMoney(user.getMoney().subtract(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))));
+        timeBase = System.currentTimeMillis();
         userRepository.save(user);
         buyOfferRepository.save(buyOffer);
+        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
         tradeService.trade(buyOfferDTO.getCompany_id());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
+
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
 
         return ResponseEntity.ok(testDetailsDTO);
