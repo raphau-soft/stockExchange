@@ -31,26 +31,6 @@ public class UserServiceImpl implements UserService {
         this.buyOfferRepository = buyOfferRepository;
     }
 
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public User findById(int theId) {
-        Optional<User> result = userRepository.findById(theId);
-
-        User user = null;
-
-        if(result.isPresent()){
-            user = result.get();
-        } else {
-            throw new RuntimeException("Didn't find user with given id: " + theId);
-        }
-
-        return user;
-    }
-
     public Map<String, Object> getUserDetails(){
         long timeApp = System.currentTimeMillis();
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
@@ -72,16 +52,6 @@ public class UserServiceImpl implements UserService {
         objects.put("testDetails", testDetailsDTO);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return objects;
-    }
-
-    @Override
-    public void deleteById(int theId) {
-        userRepository.deleteById(theId);
-    }
-
-    @Override
-    public void save(User theUser) {
-        userRepository.save(theUser);
     }
 
     @Override

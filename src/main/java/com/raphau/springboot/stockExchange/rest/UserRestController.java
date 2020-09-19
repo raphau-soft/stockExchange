@@ -18,13 +18,15 @@ public class UserRestController {
     private UserService userService;
 
     @Autowired
-    private SellOfferService sellOfferService;
-
-    @Autowired
     private BuyOfferService buyOfferService;
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private SellOfferService sellOfferService;
+
+
 
     @GetMapping("/user")
     @CrossOrigin(value = "*", maxAge = 3600)

@@ -42,9 +42,10 @@ public class TradingThread implements Runnable {
             System.out.println("\n\n\n Trying to acquire semaphore for company " + companyId + "\n\n\n");
             semaphore.acquire();
             System.out.println("\n\n\n Acquired semaphore for company " + companyId + "\n\n\n");
+            Thread.sleep(5000);
 
             // Trading logic is here
-            // check if there is 5 buy offers and 5 sell offers
+            // check if there are 5 buy offers and 5 sell offers
             getBuyOffers();
             System.out.println("\n\n\n Amount of buyoffers - " + buyOffers.size() + "\n\n\n");
             getSellOffers();
@@ -158,6 +159,7 @@ public class TradingThread implements Runnable {
         buyOffer.setActual(false);
         sellOffer.setAmount(0);
         sellOffer.setActual(false);
+        System.out.println("\n\n\n Saved stock " + stock.toString() + "\n\n\n");
         stockRepository.save(stock);
         transactionRepository.save(transaction);
         buyOfferRepository.save(buyOffer);
