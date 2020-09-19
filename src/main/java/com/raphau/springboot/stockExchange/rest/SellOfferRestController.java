@@ -15,7 +15,7 @@ import com.raphau.springboot.stockExchange.exception.StockNotFoundException;
 import com.raphau.springboot.stockExchange.exception.UserNotFoundException;
 import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import com.raphau.springboot.stockExchange.service.TradeServiceImpl;
-import com.raphau.springboot.stockExchange.service.UserService;
+import com.raphau.springboot.stockExchange.service.ints.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

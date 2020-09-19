@@ -158,7 +158,6 @@ public class TradingThread implements Runnable {
         buyOffer.setActual(false);
         sellOffer.setAmount(0);
         sellOffer.setActual(false);
-        System.out.println("\n\n\n Saved stock " + stock.toString() + "\n\n\n");
         stockRepository.save(stock);
         transactionRepository.save(transaction);
         buyOfferRepository.save(buyOffer);
