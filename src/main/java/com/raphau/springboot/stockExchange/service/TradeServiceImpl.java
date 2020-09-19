@@ -13,27 +13,11 @@ public class TradeServiceImpl {
     private final HashMap<Integer, Semaphore> companySemaphores = new HashMap<>();
 
     @Autowired
-    private BuyOfferRepository buyOfferRepository;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private StockRepository stockRepository;
-    @Autowired
-    private StockRateRepository stockRateRepository;
-
-    @Autowired
-    private SellOfferRepository sellOfferRepository;
+    private TradingThread tradingThread;
 
     public void trade(int companyId) throws InterruptedException {
         createSemaphore(companyId);
-        TradingThread thread = new TradingThread(companyId, companySemaphores.get(companyId), buyOfferRepository,
-                stockRepository, sellOfferRepository, userRepository, transactionRepository, stockRateRepository);
-        thread.run();
+        tradingThread.run(companyId, companySemaphores.get(companyId));
     }
 
     private void createSemaphore(int companyId){

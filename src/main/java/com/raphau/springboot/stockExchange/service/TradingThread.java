@@ -2,53 +2,48 @@ package com.raphau.springboot.stockExchange.service;
 
 import com.raphau.springboot.stockExchange.dao.*;
 import com.raphau.springboot.stockExchange.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
-public class TradingThread implements Runnable {
+@Service
+public class TradingThread {
 
     private final int OFFERS_NUMBER = 5;
 
-    private final int companyId;
-    private final Semaphore semaphore;
-    private final BuyOfferRepository buyOfferRepository;
-    private final StockRepository stockRepository;
-    private final SellOfferRepository sellOfferRepository;
-    private final UserRepository userRepository;
-    private final TransactionRepository transactionRepository;
-    private final StockRateRepository stockRateRepository;
-    private List<BuyOffer>  buyOffers = new ArrayList<>();
-    private final List<SellOffer>  sellOffers = new ArrayList<>();
+    @Autowired
+    private BuyOfferRepository buyOfferRepository;
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private SellOfferRepository sellOfferRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private StockRateRepository stockRateRepository;
 
-    public TradingThread(int companyId, Semaphore semaphore, BuyOfferRepository buyOfferRepository,
-                         StockRepository stockRepository, SellOfferRepository sellOfferRepository,
-                         UserRepository userRepository, TransactionRepository transactionRepository,
-                         StockRateRepository stockRateRepository){
-        this.companyId = companyId;
-        this.semaphore = semaphore;
-        this.buyOfferRepository = buyOfferRepository;
-        this.stockRepository = stockRepository;
-        this.sellOfferRepository = sellOfferRepository;
-        this.userRepository = userRepository;
-        this.transactionRepository = transactionRepository;
-        this.stockRateRepository = stockRateRepository;
-    }
 
-    @Override
-    public void run() {
+    @Async
+    public void run(int companyId, Semaphore semaphore) {
         try {
             System.out.println("\n\n\n Trying to acquire semaphore for company " + companyId + "\n\n\n");
             semaphore.acquire();
             System.out.println("\n\n\n Acquired semaphore for company " + companyId + "\n\n\n");
             Thread.sleep(5000);
 
+            List<BuyOffer>  buyOffers = new ArrayList<>();
+            List<SellOffer>  sellOffers = new ArrayList<>();
+
             // Trading logic is here
             // check if there are 5 buy offers and 5 sell offers
-            getBuyOffers();
+            getBuyOffers(buyOffers, companyId);
             System.out.println("\n\n\n Amount of buyoffers - " + buyOffers.size() + "\n\n\n");
-            getSellOffers();
+            getSellOffers(sellOffers, companyId);
+            System.out.println("\n\n\n Amount of selloffers - " + sellOffers.size() + "\n\n\n");
 
             // sort'em
             buyOffers.sort(new SortBuyOffers());
@@ -218,11 +213,11 @@ public class TradingThread implements Runnable {
         return transaction;
     }
 
-    private void getBuyOffers(){
-        buyOffers = buyOfferRepository.findByCompany_IdAndActual(companyId, true);
+    private void getBuyOffers(List<BuyOffer> buyOffers, int companyId){
+        buyOffers.addAll(buyOfferRepository.findByCompany_IdAndActual(companyId, true));
     }
 
-    private void getSellOffers(){
+    private void getSellOffers(List<SellOffer> sellOffers, int companyId){
         List<Stock> stocks = stockRepository.findByCompany_Id(companyId);
         stocks.forEach(stock -> sellOffers.addAll(stock.getSellOffers()));
         sellOffers.removeIf(sellOffer -> !sellOffer.isActual());
