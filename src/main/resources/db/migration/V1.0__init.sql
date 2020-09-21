@@ -74,6 +74,13 @@ CREATE TABLE IF NOT EXISTS `stock_rate`(
     PRIMARY KEY(`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `test`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `database_time` bigint(45) NOT NULL,
+    `application_time` bigint(45) NOT NULL,
+    PRIMARY KEY(`id`)
+);
+
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE stock_rate;
 TRUNCATE user;
@@ -82,4 +89,5 @@ TRUNCATE stock;
 TRUNCATE sell_offer;
 TRUNCATE buy_offer;
 TRUNCATE company;
+TRUNCATE test;
 SET FOREIGN_KEY_CHECKS = 1;
