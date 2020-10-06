@@ -1,10 +1,16 @@
 package com.raphau.springboot.stockExchange.service;
 
 import com.raphau.springboot.stockExchange.dao.*;
+import com.raphau.springboot.stockExchange.dto.BuyOfferDTO;
+import com.raphau.springboot.stockExchange.dto.SellOfferDTO;
 import com.raphau.springboot.stockExchange.dto.TestDetailsDTO;
 import com.raphau.springboot.stockExchange.entity.*;
+import com.raphau.springboot.stockExchange.exception.*;
+import com.raphau.springboot.stockExchange.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,16 +34,26 @@ public class TradingThread {
     private StockRateRepository stockRateRepository;
     @Autowired
     private TestRepository testRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
 
 
     @Async("asyncExecutor")
-    public void run(int companyId, Semaphore semaphore) {
+    public void run(int companyId, Semaphore semaphore, Object dto, boolean flag) {
         long timeApp = System.currentTimeMillis();
         Test test = new Test();
         try {
             System.out.println("\n\n\n Trying to acquire semaphore for company " + companyId + "\n\n\n");
             semaphore.acquire();
             System.out.println("\n\n\n Acquired semaphore for company " + companyId + "\n\n\n");
+            // flag == true is buyOffer / flag == false is sellOffer
+            if(flag){
+                addBuyOffer((BuyOfferDTO) dto);
+            } else {
+                addSellOffer((SellOfferDTO) dto);
+            }
 
             List<SellOffer>  sellOffers = new ArrayList<>();
 
@@ -78,7 +94,71 @@ public class TradingThread {
         testRepository.save(test);
     }
 
-    private void updateStockRates(int companyId, List<Transaction> transactions, Test test){
+
+    private synchronized void addBuyOffer(BuyOfferDTO buyOfferDTO){
+        Calendar c = Calendar.getInstance();
+        c.setTime(buyOfferDTO.getDateLimit());
+        c.add(Calendar.DATE, 1);
+        buyOfferDTO.setDateLimit(c.getTime());
+        buyOfferDTO.setId(0);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
+        Optional<Company> companyOptional = companyRepository.findById(buyOfferDTO.getCompany_id());
+        if(!companyOptional.isPresent()){
+            throw new CompanyNotFoundException("Company with id " + buyOfferDTO.getCompany_id() + " not found");
+        }
+        if(!userOptional.isPresent()){
+            throw new UserNotFoundException("User" + userDetails.getUsername() + " not found");
+        }
+        User user = userOptional.get();
+        Company company = companyOptional.get();
+        if(user.getMoney().compareTo(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))) < 0 || buyOfferDTO.getAmount() <= 0){
+            throw new NotEnoughMoneyException("Not enough money (Amount is " + buyOfferDTO.getAmount() + "). You have " + user.getMoney().toString() + " but you need " + buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount())).toString());
+        }
+        BuyOffer buyOffer = new BuyOffer(0, company, user,
+                buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit(), true);
+        user.setMoney(user.getMoney().subtract(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))));
+        userRepository.save(user);
+        buyOfferRepository.save(buyOffer);
+    }
+
+    private synchronized void addSellOffer(SellOfferDTO sellOfferDTO){
+        Calendar c = Calendar.getInstance();
+        c.setTime(sellOfferDTO.getDateLimit());
+        c.add(Calendar.DATE, 1);
+        sellOfferDTO.setDateLimit(c.getTime());
+        sellOfferDTO.setId(0);
+        Optional<User> userOpt = getUser();
+        Optional<Company> companyOptional = companyRepository.findById(sellOfferDTO.getCompany_id());
+        if(!companyOptional.isPresent()){
+            throw new CompanyNotFoundException("Company with id " + sellOfferDTO.getCompany_id() + " not found");
+        }
+        if(!userOpt.isPresent()){
+            throw new UserNotFoundException("User not found");
+        }
+        Optional<Stock> stockOptional = stockRepository.findByCompanyAndUser(companyOptional.get(), userOpt.get());
+        if(!stockOptional.isPresent()){
+            throw new StockNotFoundException("User " + userOpt.get().getUsername() + " doesn't have stocks of " + companyOptional.get().getName());
+        }
+        Stock stock = stockOptional.get();
+        if(sellOfferDTO.getAmount() > stock.getAmount() || sellOfferDTO.getAmount() <= 0){
+            throw new StockAmountException("Wrong amount of resources");
+        }
+        stock.setAmount(stock.getAmount() - sellOfferDTO.getAmount());
+        SellOffer sellOffer = new SellOffer(sellOfferDTO, stock);
+        stockRepository.save(stock);
+        sellOfferRepository.save(sellOffer);
+    }
+
+    private Optional<User> getUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+        return userRepository.findByUsername(userDetails.getUsername());
+    }
+
+
+    private synchronized void updateStockRates(int companyId, List<Transaction> transactions, Test test){
         double price = 0;
         int amount = 0;
         for(Transaction transaction: transactions){
@@ -149,7 +229,7 @@ public class TradingThread {
         return true;
     }
 
-    private Transaction noneOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
+    private synchronized Transaction noneOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
         double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
         Transaction transaction = new Transaction(0, buyOffer, sellOffer, sellOffer.getAmount(), price, new Date());
         User sellOfferOwner = sellOffer.getStock().getUser();
@@ -181,7 +261,7 @@ public class TradingThread {
         return transaction;
     }
 
-    private Transaction buyOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
+    private synchronized Transaction buyOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
         double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
         Transaction transaction = new Transaction(0, buyOffer, sellOffer, sellOffer.getAmount(), price, new Date());
         User sellOfferOwner = sellOffer.getStock().getUser();
@@ -210,7 +290,7 @@ public class TradingThread {
         test.setDatabaseTime(test.getDatabaseTime() + System.currentTimeMillis() - timeDB);
         return transaction;
     }
-    private Transaction sellOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
+    private synchronized Transaction sellOfferStay(BuyOffer buyOffer, SellOffer sellOffer, Test test){
         double price = (buyOffer.getMaxPrice().doubleValue() + sellOffer.getMinPrice().doubleValue())/2;
         Transaction transaction = new Transaction(0, buyOffer, sellOffer, buyOffer.getAmount(), price, new Date());
         User sellOfferOwner = sellOffer.getStock().getUser();

@@ -15,9 +15,9 @@ public class TradeServiceImpl {
     @Autowired
     private TradingThread tradingThread;
 
-    public void trade(int companyId) throws InterruptedException {
+    public void trade(int companyId, Object dto, boolean flag) throws InterruptedException {
         createSemaphore(companyId);
-        tradingThread.run(companyId, companySemaphores.get(companyId));
+        tradingThread.run(companyId, companySemaphores.get(companyId), dto, flag);
     }
 
     private void createSemaphore(int companyId){

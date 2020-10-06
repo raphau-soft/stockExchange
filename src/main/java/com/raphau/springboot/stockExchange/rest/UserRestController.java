@@ -52,7 +52,7 @@ public class UserRestController {
     @GetMapping("/user/sellOffers")
     @CrossOrigin(value = "*", maxAge = 3600)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> findSellOffers(){
+    public ResponseEntity<?> findSellOffers() throws InterruptedException {
         return ResponseEntity.ok(sellOfferService.getUserSellOffers());
     }
 

@@ -101,39 +101,9 @@ public class BuyOfferServiceImpl implements BuyOfferService {
     @Override
     public TestDetailsDTO addOffer(BuyOfferDTO buyOfferDTO) throws InterruptedException {
         long timeApp = System.currentTimeMillis();
-        Calendar c = Calendar.getInstance();
-        c.setTime(buyOfferDTO.getDateLimit());
-        c.add(Calendar.DATE, 1);
-        buyOfferDTO.setDateLimit(c.getTime());
         TestDetailsDTO testDetailsDTO = new TestDetailsDTO();
-        long timeBase = System.currentTimeMillis();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-        Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
-        Optional<Company> companyOptional = companyRepository.findById(buyOfferDTO.getCompany_id());
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase);
-
-        if(!companyOptional.isPresent()){
-            throw new CompanyNotFoundException("Company with id " + buyOfferDTO.getCompany_id() + " not found");
-        }
-        if(!userOptional.isPresent()){
-            throw new UserNotFoundException("User" + userDetails.getUsername() + " not found");
-        }
-        User user = userOptional.get();
-        Company company = companyOptional.get();
-        if(user.getMoney().compareTo(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))) < 0){
-            throw new NotEnoughMoneyException("Not enough money");
-        }
-
-        BuyOffer buyOffer = new BuyOffer(0, company, user,
-                buyOfferDTO.getMaxPrice(), buyOfferDTO.getAmount(), buyOfferDTO.getAmount(), buyOfferDTO.getDateLimit(), true);
-        user.setMoney(user.getMoney().subtract(buyOfferDTO.getMaxPrice().multiply(BigDecimal.valueOf(buyOfferDTO.getAmount()))));
-        timeBase = System.currentTimeMillis();
-        userRepository.save(user);
-        buyOfferRepository.save(buyOffer);
-        testDetailsDTO.setDatabaseTime(System.currentTimeMillis() - timeBase + testDetailsDTO.getDatabaseTime());
-        tradeService.trade(buyOfferDTO.getCompany_id());
-
+        tradeService.trade(buyOfferDTO.getCompany_id(), buyOfferDTO, true);
+        testDetailsDTO.setDatabaseTime(0);
         testDetailsDTO.setApplicationTime(System.currentTimeMillis() - timeApp);
         return testDetailsDTO;
     }
