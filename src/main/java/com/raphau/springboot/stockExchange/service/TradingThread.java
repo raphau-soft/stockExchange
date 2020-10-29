@@ -21,6 +21,7 @@ import java.util.concurrent.Semaphore;
 public class TradingThread {
 
     private final int OFFERS_NUMBER = 5;
+    public String name;
 
     @Autowired
     private BuyOfferRepository buyOfferRepository;
@@ -44,6 +45,7 @@ public class TradingThread {
     public void run(int companyId, Semaphore semaphore, Object dto, boolean flag) {
         long timeApp = System.currentTimeMillis();
         Test test = new Test();
+        test.setName(name);
         try {
             System.out.println("\n\n\n Trying to acquire semaphore for company " + companyId + "\n\n\n");
             semaphore.acquire();

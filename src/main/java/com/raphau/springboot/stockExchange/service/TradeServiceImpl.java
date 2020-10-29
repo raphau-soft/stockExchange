@@ -1,6 +1,5 @@
 package com.raphau.springboot.stockExchange.service;
 
-import com.raphau.springboot.stockExchange.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +26,4 @@ public class TradeServiceImpl {
         Semaphore semaphore = new Semaphore(1);
         companySemaphores.put(companyId, semaphore);
     }
-
 }

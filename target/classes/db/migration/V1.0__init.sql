@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS `stock_rate`(
 
 CREATE TABLE IF NOT EXISTS `test`(
     `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
     `database_time` bigint(45) NOT NULL,
     `application_time` bigint(45) NOT NULL,
     PRIMARY KEY(`id`)

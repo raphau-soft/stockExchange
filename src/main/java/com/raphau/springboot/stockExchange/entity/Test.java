@@ -12,6 +12,9 @@ public class Test implements Serializable {
     @Column(name="id")
     private int id;
 
+    @Column(name="name")
+    private String name;
+
     @Column(name="database_time")
     private long databaseTime;
 
@@ -21,10 +24,19 @@ public class Test implements Serializable {
     public Test() {
     }
 
-    public Test(int id, long database_time, long application_time) {
+    public Test(int id, String name, long databaseTime, long applicationTime) {
         this.id = id;
-        this.databaseTime = database_time;
-        this.applicationTime = application_time;
+        this.name = name;
+        this.databaseTime = databaseTime;
+        this.applicationTime = applicationTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getId() {
