@@ -90,5 +90,4 @@ TRUNCATE stock;
 TRUNCATE sell_offer;
 TRUNCATE buy_offer;
 TRUNCATE company;
-TRUNCATE test;
 SET FOREIGN_KEY_CHECKS = 1;

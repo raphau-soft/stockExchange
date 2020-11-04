@@ -26,22 +26,31 @@
   <component name="ChangeListManager">
     <list default="true" id="e28b238c-1083-4e88-844f-624a630c7d70" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/entity/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/entity/Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/dao/TestRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/dao/TestRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/entity/Stock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/entity/Stock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/rest/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/rest/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/rest/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/rest/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/MyUserDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/MyUserDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/AsyncConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/AsyncConfiguration.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/SecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/security/SecurityConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/TradeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/TradeServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/TradingThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/TradingThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/imps/TestServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/imps/TestServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/imps/TransactionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/imps/TransactionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/ints/TestService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/raphau/springboot/stockExchange/service/ints/TestService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/V1.0__init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1.0__init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/entity/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/entity/Test.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/V1.1__insert.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1.1__insert.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stockExchange.iml" beforeDir="false" afterPath="$PROJECT_DIR$/stockExchange.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/entity/Stock.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/entity/Stock.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/rest/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/rest/AuthController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/rest/TestController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/rest/TestController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/MyUserDetails.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/MyUserDetails.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/AsyncConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/AsyncConfiguration.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/SecurityConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/security/SecurityConfiguration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradeServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradeServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread$SortBuyOffers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread$SortBuyOffers.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread$SortSellOffers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread$SortSellOffers.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/TradingThread.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/imps/TestServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/imps/TestServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/imps/TransactionServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/imps/TransactionServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/ints/TestService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/raphau/springboot/stockExchange/service/ints/TestService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/db/migration/V1.0__init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/db/migration/V1.0__init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/db/migration/V1.1__insert.sql" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/db/migration/V1.1__insert.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/stockexchange-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/stockexchange-0.0.1-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/stockexchange-0.0.1-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/stockexchange-0.0.1-SNAPSHOT.jar.original" afterDir="false" />
     </list>
@@ -79,7 +88,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Quiz" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -93,15 +102,16 @@
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources" />
-      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources\db\migration" />
-      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange" />
-      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources\db.migration" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources\db\migration" />
       <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Rafal\Desktop\Enżinierka\Nowyfolder\stockExchange\src\main\resources" />
+      <recent name="C:\Users\Rafal\Desktop\Enżinierka\Nowyfolder\stockExchange\src\main\java\com\raphau\springboot\stockExchange\rest" />
+      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources" />
+      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange\src\main\resources\db\migration" />
+      <recent name="C:\Users\Rafal\Desktop\Nowyfolder\stockExchange" />
     </key>
   </component>
   <component name="RunManager" selected="Application.Stock Exchange Application">
@@ -243,6 +253,14 @@
       <workItem from="1603961377630" duration="1701000" />
       <workItem from="1603963908300" duration="2527000" />
       <workItem from="1603966491113" duration="10000" />
+      <workItem from="1603967693553" duration="3603000" />
+      <workItem from="1603988624239" duration="13000" />
+      <workItem from="1603997533696" duration="724000" />
+      <workItem from="1604001190702" duration="13000" />
+      <workItem from="1604068098069" duration="2325000" />
+      <workItem from="1604080704937" duration="2188000" />
+      <workItem from="1604485678081" duration="8721000" />
+      <workItem from="1604512406205" duration="5418000" />
     </task>
     <servers />
   </component>
@@ -295,30 +313,31 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1600533079749" />
-    <state x="686" y="211" key="FileChooserDialogImpl" timestamp="1603917444263">
+    <state x="686" y="211" key="FileChooserDialogImpl" timestamp="1604485791180">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="686" y="211" key="FileChooserDialogImpl/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1603917444262" />
+    <state x="-1371" y="173" key="FileChooserDialogImpl/-1920.4.1536.832/0.0.1920.1040@-1920.4.1536.832" timestamp="1603971922373" />
+    <state x="686" y="211" key="FileChooserDialogImpl/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1604485791180" />
     <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1600167951878" />
-    <state width="1877" height="121" key="GridCell.Tab.0.bottom" timestamp="1603966439460">
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom" timestamp="1604518772810">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="121" key="GridCell.Tab.0.bottom/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1603966439460" />
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1604518772810" />
     <state width="1493" height="193" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1600697562197" />
-    <state width="1877" height="121" key="GridCell.Tab.0.center" timestamp="1603966439459">
+    <state width="1877" height="284" key="GridCell.Tab.0.center" timestamp="1604518772810">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="121" key="GridCell.Tab.0.center/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1603966439459" />
+    <state width="1877" height="284" key="GridCell.Tab.0.center/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1604518772810" />
     <state width="1493" height="193" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1600697562197" />
-    <state width="1877" height="121" key="GridCell.Tab.0.left" timestamp="1603966439459">
+    <state width="1877" height="284" key="GridCell.Tab.0.left" timestamp="1604518772810">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="121" key="GridCell.Tab.0.left/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1603966439459" />
+    <state width="1877" height="284" key="GridCell.Tab.0.left/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1604518772810" />
     <state width="1493" height="193" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1600697562196" />
-    <state width="1877" height="121" key="GridCell.Tab.0.right" timestamp="1603966439460">
+    <state width="1877" height="284" key="GridCell.Tab.0.right" timestamp="1604518772810">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="121" key="GridCell.Tab.0.right/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1603966439460" />
+    <state width="1877" height="284" key="GridCell.Tab.0.right/-1920.4.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1604518772810" />
     <state width="1493" height="193" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1600697562197" />
     <state width="1493" height="112" key="GridCell.Tab.1.bottom" timestamp="1596718255593">
       <screen x="0" y="0" width="1536" height="824" />

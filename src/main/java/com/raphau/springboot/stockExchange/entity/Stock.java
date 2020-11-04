@@ -15,7 +15,7 @@ public class Stock implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
@@ -23,7 +23,7 @@ public class Stock implements Serializable {
     @JoinColumn(name="company_id", nullable = false)
     private Company company;
 
-    @OneToMany(mappedBy = "stock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "stock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonBackReference
     private List<SellOffer> sellOffers;
 
